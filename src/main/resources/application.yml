@@ -7,8 +7,8 @@ spring:
     password: 051505Db!!
 
 
-##MYBATIS
-#
-#  mybatis:
-#    type-aliases-package: com.zerobase.shopping.entity
-#    mapper-locations: /mapper/**/*.xml
+#MYBATIS
+
+mybatis:
+  type-aliases-package: com.zerobase.shopping.vo
+  mapper-locations: /mapper/**/*.xml
