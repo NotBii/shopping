@@ -1,10 +1,11 @@
 package com.zerobase.shopping.web.controller;
 
+import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.service.AccountService;
-import com.zerobase.shopping.vo.AccountVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,15 +24,15 @@ public class AccountController {
   //회원가입
 
   @PostMapping("/signup")
-  public ResponseEntity<?> signup(@RequestBody AccountVo accountVo) {
+  public ResponseEntity<?> signup(@RequestBody AccountDto accountDto) {
 
-    AccountVo result = this.accountService.signup(accountVo);
+    AccountDto result = this.accountService.signup(accountDto);
 
     return ResponseEntity.ok(result);
   }
   //id 중복체크
 
-  @GetMapping("/idcheck")
+  @GetMapping("/id-check")
   public ResponseEntity<?> idCheck(@RequestParam String userid) {
 
     boolean result = this.accountService.idCheck(userid);
@@ -41,7 +42,7 @@ public class AccountController {
   }
 
   //email 중복체크
-  @GetMapping ("/mailcheck")
+  @GetMapping ("/mail-check")
   public ResponseEntity<?> mailCheck(@RequestParam String mail) {
 
     boolean result = this.accountService.mailCheck(mail);
@@ -50,26 +51,43 @@ public class AccountController {
   }
   //닉네임 중복체크
 
+  @GetMapping ("/nickname-check")
+  public ResponseEntity<?> nicknameCheck(@RequestParam String nickname) {
+
+    boolean result = this.accountService.nicknameCheck(nickname);
+
+    return ResponseEntity.ok(result);
+  }
+
   //회원 정보 조회
   @GetMapping ("/user-details")
   public ResponseEntity<?> userDetails(@RequestParam String userid) {
 
-    AccountVo result = this.accountService.userDetails(userid);
+    AccountDto result = this.accountService.userDetails(userid);
 
     return ResponseEntity.ok(result);
   }
 
   //회원 정보 수정
   @PostMapping("/update-profile")
-  public ResponseEntity<?> updateProfile(@RequestBody AccountVo accountVo) {
+  public ResponseEntity<?> updateProfile(@RequestBody AccountDto accountDto) {
 
-    AccountVo result = this.accountService.updateProfile(accountVo);
+    AccountDto result = this.accountService.updateProfile(accountDto);
 
     return ResponseEntity.ok(result);
   }
 
   //회원 탈퇴
+  @DeleteMapping("/resign")
+  public ResponseEntity<?> resign(@RequestBody AccountDto accountDto) {
+
+    AccountDto result = this.accountService.resign(accountDto);
+
+    return ResponseEntity.ok(accountDto);
+  }
   //id 찾기
+
+
   //pw 찾기
 
 }

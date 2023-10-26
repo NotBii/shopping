@@ -1,4 +1,4 @@
-package com.zerobase.shopping.vo;
+package com.zerobase.shopping.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class AccountVo {
+public class AccountDto {
   private int no;
   private String userid;
   private String password;

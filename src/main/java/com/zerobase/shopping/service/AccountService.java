@@ -1,7 +1,7 @@
 package com.zerobase.shopping.service;
 
-import com.zerobase.shopping.mapper.AccountMapper;
-import com.zerobase.shopping.vo.AccountVo;
+import com.zerobase.shopping.dto.AccountDto;
+import com.zerobase.shopping.dao.AccountDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,41 +11,55 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AccountService {
 
-  private final AccountMapper accountMapper;
+  private final AccountDao accountDao;
 
   //회원가입
-  public AccountVo signup(AccountVo accountVo) {
+  public AccountDto signup(AccountDto accountDto) {
 
-    accountMapper.signup(accountVo);
+    accountDao.signup(accountDto);
 
-    return accountVo;
+    return accountDto;
   }
 
   //id 중복체크
   public boolean idCheck(String userid) {
-    boolean result = accountMapper.idCheck(userid);
+    boolean result = accountDao.idCheck(userid);
     return result;
   }
 
   //mail 중복체크
 
   public boolean mailCheck(String mail) {
-    boolean result = accountMapper.mailCheck(mail);
+    boolean result = accountDao.mailCheck(mail);
+    return result;
+  }
+
+  //닉네임 중복체크
+
+  public boolean nicknameCheck(String nickname) {
+    boolean result = accountDao.nicknameCheck(nickname);
     return result;
   }
 
   //회원정보 조회
 
-  public AccountVo userDetails(String userid) {
-    AccountVo result = accountMapper.userDetails(userid);
+  public AccountDto userDetails(String userid) {
+    AccountDto result = accountDao.userDetails(userid);
 
     return result;
   }
+  //회원정보 수정
+  public AccountDto updateProfile(AccountDto accountDto) {
+    accountDao.updateProfile(accountDto);
 
-  public AccountVo updateProfile(AccountVo accountVo) {
-    accountMapper.updateProfile(accountVo);
-
-    return accountVo;
+    return accountDto;
   }
 
+  //회원정보 삭제
+
+  public AccountDto resign(AccountDto accountDto) {
+    accountDao.resign(accountDto);
+
+    return accountDto;
+  }
 }

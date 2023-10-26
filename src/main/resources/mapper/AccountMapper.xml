@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.zerobase.shopping.mapper.AccountMapper">
+<mapper namespace="com.zerobase.shopping.dao.AccountDao">
   <!-- 회원가입 -->
   <insert id="signup">
     INSERT INTO account(userid, password, nickname, mail, role)
@@ -17,18 +17,29 @@
     SELECT IF(COUNT(mail) = 1, 1, 0) FROM account
     WHERE mail = #{mail}
   </select>
-
-  <select id="userDetails" resultType = "AccountVo">
+  <!-- nickname 중복확인 -->
+  <select id = "nicknamecheck" resultType ="boolean">
+    SELECT IF(COUNT(nickname) = 1, 1, 0) FROM account
+    WHERE nickname = #{nickname}
+  </select>
+  <!-- 유저상세보기 -->
+  <select id="userDetails" resultType = "AccountDto">
     SELECT *
     FROM account
     WHERE userid = #{userid}
   </select>
-
+  <!-- 프로필 수정 -->
   <update id="updateProfile">
     UPDATE account
     SET password = #{password},
         nickname = #{nickname}
     WHERE userid = #{userid}
   </update>
+
+  <!-- 탈퇴 -->
+  <delete id="resign" >
+    DELETE FROM account
+    WHERE userid={userid} AND password={password}
+  </delete>
 
 </mapper>
