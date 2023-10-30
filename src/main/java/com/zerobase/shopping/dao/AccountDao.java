@@ -14,7 +14,6 @@ public interface AccountDao {
   boolean mailCheck(String mail);
   boolean nicknameCheck(String nickname);
   void updateProfile(AccountDto accountDto);
-
   void resign(AccountDto accountDto);
 
   Optional<AccountDto> userDetails(String userId);

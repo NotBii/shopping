@@ -1,6 +1,8 @@
 package com.zerobase.shopping.web.controller;
 
 import com.zerobase.shopping.dto.AccountDto;
+import com.zerobase.shopping.model.AccountModel;
+import com.zerobase.shopping.security.TokenProvider;
 import com.zerobase.shopping.service.AccountService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +24,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
   private final AccountService accountService;
+
+  private final TokenProvider tokenProvider;
+
   //회원가입
 
-  @PostMapping("/signup")
-  public ResponseEntity<?> signup(@RequestBody AccountDto accountDto) {
+  @PostMapping("/sign-up")
+  public ResponseEntity<?> signUp(@RequestBody AccountModel.SignUp request) {
 
-    AccountDto result = this.accountService.signup(accountDto);
+    AccountDto result = this.accountService.signup(request);
 
     return ResponseEntity.ok(result);
+  }
+
+  @PostMapping("/sign-in")
+  public ResponseEntity<?> signIn(@RequestBody AccountModel.SignIn request) {
+    AccountDto account = this.accountService.authenticate(request);
+    String token = this.tokenProvider.generateToken(account.getUserid(), account.getRole());
+
+    return ResponseEntity.ok(token);
   }
   //id 중복체크
 

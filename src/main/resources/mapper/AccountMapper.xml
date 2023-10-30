@@ -23,7 +23,7 @@
     WHERE nickname = #{nickname}
   </select>
   <!-- 유저상세보기 -->
-  <select id="userDetails" resultType = "AccountDto">
+  <select id="userDetails" resultType = "com.zerobase.shopping.dto.AccountDto">
     SELECT *
     FROM account
     WHERE userid = #{userid}
@@ -41,6 +41,7 @@
     DELETE FROM account
     WHERE userid={userid} AND password={password}
   </delete>
+
 
 
 </mapper>

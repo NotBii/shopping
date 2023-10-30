@@ -2,6 +2,7 @@ package com.zerobase.shopping.service;
 
 import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.dao.AccountDao;
+import com.zerobase.shopping.model.AccountModel;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,13 +29,27 @@ public class AccountService implements UserDetailsService{
   }
 
   //회원가입
-  public AccountDto signup(AccountDto accountDto) {
+  public AccountDto signup(AccountModel.SignUp request) {
 
+    request.setPassword((this.passwordEncoder.encode(request.getPassword())));
+    AccountDto accountDto = request.toDto();
     this.accountDao.signup(accountDto);
+
 
     return accountDto;
   }
 
+  //로그인
+
+  public AccountDto authenticate(AccountModel.SignIn request) {
+    AccountDto user = this.accountDao.userDetails(request.getUserid())
+        .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디 입니다"));
+
+    if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      throw new RuntimeException("비밀번호가 일치하지 않습니다");
+    }
+    return user;
+  }
   //id 중복체크
   public boolean idCheck(String userId) {
     boolean result = this.accountDao.idCheck(userId);
