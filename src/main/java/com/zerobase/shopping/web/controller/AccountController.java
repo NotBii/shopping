@@ -2,6 +2,7 @@ package com.zerobase.shopping.web.controller;
 
 import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.service.AccountService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class AccountController {
   @GetMapping ("/user-details")
   public ResponseEntity<?> userDetails(@RequestParam String userid) {
 
-    AccountDto result = this.accountService.userDetails(userid);
+    Optional<AccountDto> result = this.accountService.userDetails(userid);
 
     return ResponseEntity.ok(result);
   }
