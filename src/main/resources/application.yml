@@ -6,6 +6,12 @@ spring:
     username: root
     password: 051505Db!!
 
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  jwt:
+    secret: YmlpaXNnb2luZ2VuY29kZXRvbWFrZXNvbWVzZWNyZXQ=
 
 #MYBATIS
 
