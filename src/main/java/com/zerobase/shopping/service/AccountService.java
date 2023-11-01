@@ -6,7 +6,6 @@ import com.zerobase.shopping.model.AccountModel;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,14 +17,24 @@ import org.springframework.stereotype.Service;
 public class AccountService implements UserDetailsService{
 
   private final AccountDao accountDao;
-
+  private final AccountModel accountModel;
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public UserDetails loadUserByUsername(String userId) {
-    return this.accountDao.userDetails(userId)
+  public AccountModel loadUserByUsername(String userId) {
+    AccountDto accountDto = this.accountDao.userDetails(userId)
         .orElseThrow(()-> new UsernameNotFoundException("유저를 찾을 수 없습니다" + " -> " + userId));
 
+    AccountModel model = accountModel.builder()
+        .no(accountDto.getNo())
+        .userid(accountDto.getUserid())
+        .role(accountDto.getRole())
+        .mail(accountDto.getRole())
+        .nickname(accountDto.getNickname())
+        .password(accountDto.getPassword())
+        .build();
+
+    return model;
   }
 
   //회원가입
@@ -74,7 +83,6 @@ public class AccountService implements UserDetailsService{
 
   public Optional<AccountDto> userDetails(String userId) {
     Optional<AccountDto> result = this.accountDao.userDetails(userId);
-
     return result;
   }
   //회원정보 수정

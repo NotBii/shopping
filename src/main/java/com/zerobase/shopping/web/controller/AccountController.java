@@ -7,7 +7,9 @@ import com.zerobase.shopping.service.AccountService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +44,7 @@ public class AccountController {
     AccountDto account = this.accountService.authenticate(request);
     String token = this.tokenProvider.generateToken(account.getUserid(), account.getRole());
 
+    log.info("login");
     return ResponseEntity.ok(token);
   }
   //id 중복체크
@@ -73,10 +76,16 @@ public class AccountController {
     return ResponseEntity.ok(result);
   }
 
+  /**
+   * 로그인시 발급된 토큰에서 유저 정보(이름, role)
+   * @param user
+   *
+   */
+
   //회원 정보 조회
   @GetMapping ("/user-details")
-  public ResponseEntity<?> userDetails(@RequestParam String userid) {
-
+  public ResponseEntity<?> userDetails(@AuthenticationPrincipal AccountModel user) {
+    String userid = user.getUsername();
     Optional<AccountDto> result = this.accountService.userDetails(userid);
 
     return ResponseEntity.ok(result);

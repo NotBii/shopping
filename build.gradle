@@ -1,3 +1,4 @@
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.4'
@@ -26,7 +27,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-devtools'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     //db dependency
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2'
@@ -44,6 +45,15 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 }
+
+task copyYML(type: Copy) {
+    copy {
+        from './keys/shopping'
+        include '*.yml'
+        into 'src/main/resources'
+    }
+}
+
 
 tasks.named('test') {
     useJUnitPlatform()
