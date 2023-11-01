@@ -21,8 +21,8 @@ public class MailModel {
   public MailDto toDto() {
     return MailDto.builder()
         .address(this.address)
-        .address(this.title)
-        .address(this.message)
+        .title(this.title)
+        .message(this.message)
         .build();
   }
 

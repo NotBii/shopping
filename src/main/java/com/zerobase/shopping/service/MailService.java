@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class MailService {
   private JavaMailSender mailSender;
-  private static final String FROM_ADDRESS = "costic1375@gmail.com";
+  private static final String FROM_ADDRESS = "crostic123@gmail.com";
 
   public MailDto findId(String mail, String id) {
     MailModel mailModel = new MailModel();
@@ -27,6 +27,7 @@ public class MailService {
   }
 
   public void sendMail(MailDto mailDto) {
+    log.info(mailDto.getAddress());
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom(FROM_ADDRESS);
     message.setTo(mailDto.getAddress());

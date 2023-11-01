@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="AccountDao">
+<mapper namespace="com.zerobase.shopping.dao.AccountDao">
   <!-- 회원가입 -->
   <insert id="signup">
     INSERT INTO account(userid, password, nickname, mail, role)
     VALUES (#{userId}, #{password}, #{nickName}, #{mail}, #{role})
   </insert>
   <!-- id 중복확인 -->
-  <select id="idCheck" resultType = "boolean">
+  <select id="idCheck" resultType="boolean">
     SELECT IF(COUNT(userid) = 1, 1, 0) FROM account
     WHERE userid = #{userId}
   </select>
   <!-- mail 중복확인 -->
-  <select id ="mailCheck" resultType = "boolean">
+  <select id="mailCheck" resultType="boolean">
     SELECT IF(COUNT(mail) = 1, 1, 0) FROM account
     WHERE mail = #{mail}
   </select>
@@ -36,19 +36,19 @@
     WHERE userid = #{userId}
   </update>
   <!-- 비밀번호 대조용 -->
-  <select id="checkPassword" parameterType="String" resultType ="AccountDto">
+  <select id="checkPassword" resultType="AccountDto">
     SELECT *
     FROM account
     WHERE userid = #{userId}
   </select>
   <!-- 탈퇴 -->
-  <delete id="resign" >
+  <delete id="resign">
     DELETE FROM account
     WHERE userid= #{userId} AND password= #{password}
   </delete>
 
   <!-- id 찾기 -->
-  <select id = "findId">
+  <select id="findId">
     SELECT userid
     FROM account
     WHERE mail= #{mail}
