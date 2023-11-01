@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.zerobase.shopping.dao.AccountDao">
+<mapper namespace="AccountDao">
   <!-- 회원가입 -->
   <insert id="signup">
     INSERT INTO account(userid, password, nickname, mail, role)
-    VALUES (#{userid}, #{password}, #{nickname}, #{mail}, #{role})
+    VALUES (#{userId}, #{password}, #{nickName}, #{mail}, #{role})
   </insert>
   <!-- id 중복확인 -->
   <select id="idCheck" resultType = "boolean">
     SELECT IF(COUNT(userid) = 1, 1, 0) FROM account
-    WHERE userid = #{userid}
+    WHERE userid = #{userId}
   </select>
   <!-- mail 중복확인 -->
   <select id ="mailCheck" resultType = "boolean">
@@ -18,30 +18,40 @@
     WHERE mail = #{mail}
   </select>
   <!-- nickname 중복확인 -->
-  <select id = "nicknamecheck" resultType ="boolean">
+  <select id="nickNameCheck" resultType="boolean">
     SELECT IF(COUNT(nickname) = 1, 1, 0) FROM account
-    WHERE nickname = #{nickname}
+    WHERE nickname = #{nickName}
   </select>
   <!-- 유저상세보기 -->
-  <select id="userDetails" resultType = "com.zerobase.shopping.dto.AccountDto">
-    SELECT *
+  <select id="userDetails" resultType="AccountDto">
+    SELECT no, userid, nickname, mail, role, date
     FROM account
-    WHERE userid = #{userid}
+    WHERE userid = #{userId}
   </select>
   <!-- 프로필 수정 -->
   <update id="updateProfile">
     UPDATE account
     SET password = #{password},
-        nickname = #{nickname}
-    WHERE userid = #{userid}
+        nickname = #{nickName}
+    WHERE userid = #{userId}
   </update>
-
+  <!-- 비밀번호 대조용 -->
+  <select id="checkPassword" parameterType="String" resultType ="AccountDto">
+    SELECT *
+    FROM account
+    WHERE userid = #{userId}
+  </select>
   <!-- 탈퇴 -->
   <delete id="resign" >
     DELETE FROM account
-    WHERE userid={userid} AND password={password}
+    WHERE userid= #{userId} AND password= #{password}
   </delete>
 
-
+  <!-- id 찾기 -->
+  <select id = "findId">
+    SELECT userid
+    FROM account
+    WHERE mail= #{mail}
+  </select>
 
 </mapper>

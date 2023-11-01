@@ -15,9 +15,9 @@ import lombok.ToString;
 
 public class AccountDto {
   private int no;
-  private String userid;
+  private String userId;
   private String password;
-  private String nickname;
+  private String nickName;
   private String mail;
   private String role;
   private String date;

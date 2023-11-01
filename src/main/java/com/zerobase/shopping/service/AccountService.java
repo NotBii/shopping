@@ -27,10 +27,10 @@ public class AccountService implements UserDetailsService{
 
     AccountModel model = accountModel.builder()
         .no(accountDto.getNo())
-        .userid(accountDto.getUserid())
+        .userId(accountDto.getUserId())
         .role(accountDto.getRole())
         .mail(accountDto.getRole())
-        .nickname(accountDto.getNickname())
+        .nickName(accountDto.getNickName())
         .password(accountDto.getPassword())
         .build();
 
@@ -51,7 +51,7 @@ public class AccountService implements UserDetailsService{
   //로그인
 
   public AccountDto authenticate(AccountModel.SignIn request) {
-    AccountDto user = this.accountDao.userDetails(request.getUserid())
+    AccountDto user = this.accountDao.checkPassword(request.getUserId())
         .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디 입니다"));
 
     if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -75,7 +75,7 @@ public class AccountService implements UserDetailsService{
   //닉네임 중복체크
 
   public boolean nicknameCheck(String nickname) {
-    boolean result = this.accountDao.nicknameCheck(nickname);
+    boolean result = this.accountDao.nickNameCheck(nickname);
     return result;
   }
 
@@ -100,5 +100,12 @@ public class AccountService implements UserDetailsService{
     return accountDto;
   }
 
+  //메일주소로 id찾기
+
+  public String findId(String mail) {
+    String id = this.accountDao.findId(mail);
+
+    return id;
+  }
 
 }

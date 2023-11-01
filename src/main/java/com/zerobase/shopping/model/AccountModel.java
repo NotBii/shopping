@@ -26,9 +26,9 @@ import org.springframework.stereotype.Component;
 public class AccountModel implements UserDetails {
 
   private int no;
-  private String userid;
+  private String userId;
   private String password;
-  private String nickname;
+  private String nickName;
   private String mail;
   private String role;
   private String date;
@@ -45,7 +45,7 @@ public class AccountModel implements UserDetails {
 
   @Override
   public String getUsername() {
-    return this.getUserid();
+    return this.getUserId();
   }
 
   @Override
@@ -70,23 +70,23 @@ public class AccountModel implements UserDetails {
 
   @Data
   public static class SignIn {
-    private String userid;
+    private String userId;
     private String password;
   }
 
   @Data
   public static class SignUp {
-    private String userid;
+    private String userId;
     private String password;
-    private String nickname;
+    private String nickName;
     private String mail;
     private String role;
 
     public AccountDto toDto() {
       return AccountDto.builder()
-          .userid(this.userid)
+          .userId(this.userId)
           .password(this.password)
-          .nickname(this.nickname)
+          .nickName(this.nickName)
           .mail(this.mail)
           .role(this.role)
           .build();
