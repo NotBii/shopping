@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 backup.yml
 application.yml
-keys
+
 
 ### STS ###
 .apt_generated
