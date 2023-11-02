@@ -93,4 +93,15 @@ public class AccountModel implements UserDetails {
     }
   }
 
+  public AccountDto toDto() {
+    return AccountDto.builder()
+        .userId(this.userId)
+        .password(this.password)
+        .nickName(this.nickName)
+        .mail(this.mail)
+        .role(this.role)
+        .date(this.date)
+        .build();
+  }
+
 }

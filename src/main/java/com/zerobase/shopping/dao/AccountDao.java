@@ -21,4 +21,6 @@ public interface AccountDao {
 
   String findId(String mail);
 
+  Optional<AccountDto> findPassword(String userId, String mail);
+
 }

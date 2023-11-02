@@ -54,4 +54,11 @@
     WHERE mail= #{mail}
   </select>
 
+  <!-- 비밀번호 찾기 -->
+  <select id="findPassword" resultType="AccountDto">
+    SELECT *
+    FROM account
+    WHERE userid = #{userId} AND mail = #{mail}
+  </select>
+
 </mapper>

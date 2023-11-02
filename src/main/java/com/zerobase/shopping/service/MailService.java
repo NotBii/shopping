@@ -15,15 +15,20 @@ public class MailService {
   private JavaMailSender mailSender;
   private static final String FROM_ADDRESS = "crostic123@gmail.com";
 
-  public MailDto findId(String mail, String id) {
+  public MailDto findId(String mail, String userId) {
     MailModel mailModel = new MailModel();
     mailModel.setAddress(mail);
     mailModel.setTitle("쇼핑몰 id 찾기 결과");
-    mailModel.setMessage("쇼핑몰의 id는   " + id + "    입니다");
+    mailModel.setMessage("쇼핑몰의 id는   " + userId + "    입니다");
 
     MailDto mailDto = mailModel.toDto();
 
     return mailDto;
+  }
+
+  public MailDto changePassword(String mail, String userId) {
+
+    return null;
   }
 
   public void sendMail(MailDto mailDto) {

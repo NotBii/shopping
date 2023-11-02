@@ -113,7 +113,7 @@ public class AccountController {
   }
   //id 찾기
   @GetMapping("/find-id")
-  public ResponseEntity<?> findId(String mail) {
+  public ResponseEntity<?> findId(@RequestParam String mail) {
     String id = accountService.findId(mail);
     String result = "등록된 메일 주소가 존재하지 않습니다";
 
@@ -127,5 +127,10 @@ public class AccountController {
   }
 
   //pw 찾기
+  @GetMapping("/find-pw")
+  public ResponseEntity<?> findPassword(@RequestParam String userid, String mail) {
 
+
+    return null;
+  }
 }
