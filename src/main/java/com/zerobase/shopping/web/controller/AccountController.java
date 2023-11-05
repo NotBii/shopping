@@ -42,6 +42,7 @@ public class AccountController {
     return ResponseEntity.ok(result);
   }
 
+  //로그인
   @PostMapping("/sign-in")
   public ResponseEntity<?> signIn(@RequestBody AccountModel.SignIn request) {
     AccountDto account = this.accountService.authenticate(request);
@@ -69,8 +70,8 @@ public class AccountController {
 
     return ResponseEntity.ok(result);
   }
-  //닉네임 중복체크
 
+  //닉네임 중복체크
   @GetMapping ("/check-nickname")
   public ResponseEntity<?> nicknameCheck(@RequestParam String nickname) {
 
@@ -79,15 +80,11 @@ public class AccountController {
     return ResponseEntity.ok(result);
   }
 
-  /**
-   * 로그인시 발급된 토큰에서 유저 정보(이름, role)
-   * @param user
-   *
-   */
+
 
   //회원 정보 조회
   @GetMapping ("/user-details")
-  public ResponseEntity<?> userDetails(@RequestParam String userid, @AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<?> userDetails(@RequestParam String userid) {
 
     Optional<AccountDto> result = this.accountService.userDetails(userid);
 
@@ -125,12 +122,34 @@ public class AccountController {
 
     return ResponseEntity.ok(result);
   }
+  //비밀번호체크 api
+  @PostMapping("/check-pw")
+  public ResponseEntity<?> checkPassword(@RequestBody AccountModel accountModel, @AuthenticationPrincipal AccountModel user ) {
+
+    accountModel.setUserId(user.getUserId());
+
+  boolean result = accountService.checkPassword(accountModel);
+
+  return ResponseEntity.ok(result);
+  }
+
+  //비밀번호변경
+  @PostMapping("/change-pw")
+  public ResponseEntity<?> changePassword(@RequestBody AccountDto request, @AuthenticationPrincipal AccountModel user) {
+
+    user.setPassword(request.getPassword());
+    AccountDto accountDto = user.toDto();
+    accountService.changePassword(accountDto);
+
+    return ResponseEntity.ok(accountDto);
+  }
 
   //pw 찾기
   @GetMapping("/find-pw")
   public ResponseEntity<?> findPassword(@RequestParam String userid, String mail) {
 
+    String result = accountService.findPassword(userid, mail);
 
-    return null;
+    return ResponseEntity.ok(result);
   }
 }

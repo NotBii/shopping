@@ -61,4 +61,11 @@
     WHERE userid = #{userId} AND mail = #{mail}
   </select>
 
+  <!-- 비밀번호 변경 -->
+  <update id="changePassword">
+    UPDATE account
+    SET password = #{password}
+    WHERE userid = #{userId}
+  </update>
+
 </mapper>

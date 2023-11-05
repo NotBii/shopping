@@ -23,4 +23,6 @@ public interface AccountDao {
 
   Optional<AccountDto> findPassword(String userId, String mail);
 
+  void changePassword(AccountDto accountDto);
+
 }

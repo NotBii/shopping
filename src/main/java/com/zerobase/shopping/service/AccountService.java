@@ -19,6 +19,7 @@ public class AccountService implements UserDetailsService{
 
   private final AccountDao accountDao;
   private final AccountModel accountModel;
+  private final MailService mailService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
@@ -35,6 +36,7 @@ public class AccountService implements UserDetailsService{
         .password(accountDto.getPassword())
         .build();
 
+    log.info(model.getUsername() + "정보 로드");
     return model;
   }
 
@@ -60,6 +62,7 @@ public class AccountService implements UserDetailsService{
     }
     return user;
   }
+
   //id 중복체크
   public boolean idCheck(String userId) {
     boolean result = this.accountDao.idCheck(userId);
@@ -86,6 +89,13 @@ public class AccountService implements UserDetailsService{
     Optional<AccountDto> result = this.accountDao.userDetails(userId);
     return result;
   }
+  //비밀번호 체크
+  public boolean checkPassword(AccountModel request) {
+    AccountDto user = this.accountDao.checkPassword(request.getUserId()).get();
+    boolean result = (this.passwordEncoder.matches(request.getPassword(), user.getPassword()));
+    return result;
+  }
+
   //회원정보 수정
   public AccountDto updateProfile(AccountDto accountDto) {
     this.accountDao.updateProfile(accountDto);
@@ -107,30 +117,46 @@ public class AccountService implements UserDetailsService{
 
     return userId;
   }
+
+
   //비밀번호 변경
 
+  public void changePassword(AccountDto accountDto) {
+    log.info("비밀번호 변경");
+    this.accountDao.changePassword(accountDto);
+  }
 
 
   //userId, 메일주소로 비밀번호 초기화
-
-  public String findPw(String userId, String mail) {
+  public String findPassword(String userId, String mail) {
     Optional<AccountDto> request = this.accountDao.findPassword(userId, mail);
+    String result = "";
 
     if (!request.isEmpty()) {
       String tempPassword = getTempPassword();
-      AccountModel model = new AccountModel();
+      AccountDto requestDto = request.get();
 
-      model.builder()
-          .userId(request.get().getUserId())
+      log.info(requestDto.getUserId());
+
+      AccountModel model = AccountModel.builder()
+          .userId(requestDto.getUserId())
           .password(this.passwordEncoder.encode(tempPassword))
-          .mail(request.get().getMail())
+          .mail(requestDto.getMail())
           .build();
+      log.info("model" + model);
+      AccountDto accountDto = model.toDto();
+      log.info("modeltoDTO" + accountDto);
+      this.changePassword(accountDto);
+      mailService.findPassword(accountDto, tempPassword);
+      result = "임시 비밀번호 발송 성공";
+      log.info("비밀번호 변경" + userId);
 
-      model.toDto();
+    } else {
+      result = "ID와 메일 주소를 확인해 주세요";
     }
 
 
-    return null;
+    return result;
   }
 
   //랜덤비밀번호 로직
