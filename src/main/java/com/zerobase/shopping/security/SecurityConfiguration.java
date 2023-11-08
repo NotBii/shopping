@@ -26,12 +26,6 @@ public class SecurityConfiguration {
   private final JwtAuthenticationFilter authenticationFilter;
 
 
-//  @Bean
-//  public WebSecurityCustomizer webSecurityCustomizer() {
-//    return (web) -> web.ignoring()
-//        .requestMatchers(new AntPathRequestMatcher("/account/sign-up"))
-//        .requestMatchers(new AntPathRequestMatcher("/account/sign-in"));
-//  }
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
@@ -40,9 +34,12 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(request -> request
                 .requestMatchers( "/account/sign-up", "/account/sign-in", "/account/check-id", "/account/check-mail", "/account/check-nickname", "/account/find-id", "/account/find-pw").permitAll())
         .authorizeHttpRequests(request -> request.anyRequest().authenticated())
+        .logout((logout) -> logout
+            .logoutRequestMatcher(new AntPathRequestMatcher("/account/logout"))
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true))
     ;
-//        .httpBasic(Customizer.withDefaults())
-//        .addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
     return http.build();
   }
 

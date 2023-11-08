@@ -6,11 +6,16 @@ import com.zerobase.shopping.model.AccountModel;
 import com.zerobase.shopping.security.TokenProvider;
 import com.zerobase.shopping.service.AccountService;
 import com.zerobase.shopping.service.MailService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +55,19 @@ public class AccountController {
 
     log.info("login");
     return ResponseEntity.ok(token);
+  }
+
+  //로그아웃
+  @GetMapping("/logout")
+  public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    if (auth != null) {
+      new SecurityContextLogoutHandler().logout(request, response, auth);
+    }
+
+    return ResponseEntity.ok("로그아웃되었습니다");
+
   }
 
   //id 중복체크
