@@ -1,0 +1,3 @@
+[submodule "key"]
+	path = keys
+	url = https://github.com/NotBii/keys.git
