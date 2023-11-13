@@ -36,6 +36,10 @@
       <maxHistory>60</maxHistory>
     </rollingPolicy>
   </appender>
+  <!-- logger 설정 -->
+  <logger name = "com.zerobase.shopping" level ="DEBUG" appender-ref = "console" />
+  <logger name = "jdbc.sqlonly" level = "INFO" appender-ref= "console-infolog" />
+  <logger name = "jdbc.resultsettable" level="INFO" appender-ref="console-infolog" />
   <root level="${LOGS_LEVEL}">
     <appender-ref ref="FILE"/>
   </root>

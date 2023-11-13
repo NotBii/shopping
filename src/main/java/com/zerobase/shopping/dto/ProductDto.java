@@ -21,4 +21,5 @@ public class ProductDto {
   private String date;
   private String modifiedDate;
   private String img;
+  private int delete;
 }
