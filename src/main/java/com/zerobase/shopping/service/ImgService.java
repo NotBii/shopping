@@ -2,6 +2,7 @@ package com.zerobase.shopping.service;
 
 import com.zerobase.shopping.dao.ImgDao;
 import com.zerobase.shopping.dto.ImgDto;
+import com.zerobase.shopping.model.ImgUpdateModel;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -113,7 +114,7 @@ public class ImgService {
    */
   @Transactional
   public String saveImgs(final List<ImgDto> imgs) {
-    String fileNo = "0";
+    String fileNo = "";
     if (CollectionUtils.isEmpty(imgs)) {
       return fileNo;
     }
@@ -129,5 +130,18 @@ public class ImgService {
     return fileNo;
   }
 
+  @Transactional
+  public String updateImg(final List<MultipartFile> multipartFiles, ImgUpdateModel imgUpdateModel) {
+    StringBuilder sb = new StringBuilder(imgUpdateModel.getUpdatedImgs());
 
+    if (imgUpdateModel.getAdd()==1) {
+      List<ImgDto> imgs = uploadImgs(multipartFiles);
+      String fileNo = saveImgs(imgs);
+      sb.append(",");
+      sb.append(fileNo);
+    }
+        String result = sb.toString();
+
+    return result;
+  }
 }
