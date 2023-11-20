@@ -32,7 +32,9 @@ public class SecurityConfiguration {
         .addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(request -> request
-                .requestMatchers( "/account/sign-up", "/account/sign-in", "/account/check-id", "/account/check-mail", "/account/check-nickname", "/account/find-id", "/account/find-pw").permitAll())
+                .requestMatchers( "/account/sign-up", "/account/sign-in", "/account/check-id", "/account/check-mail", "/account/check-nickname", "/account/find-id", "/account/find-pw",
+                "/product/product-detail/**", "/product-list"
+                ).permitAll())
         .authorizeHttpRequests(request -> request.anyRequest().authenticated())
         .logout((logout) -> logout
             .logoutRequestMatcher(new AntPathRequestMatcher("/account/logout"))
