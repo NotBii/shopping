@@ -23,4 +23,7 @@ public interface ProductDao {
 
   void updateSalesRate(int no);
 
+
+  int checkProductStock (int no);
+
 }

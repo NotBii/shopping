@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zerobase.shopping.dao.CartDao">
+  <!-- 상품등록 -->
+  <insert id ="addCart" parameterType="CartDto" >
+    INSERT INTO cart(date, name, product_no, product_count)
+    VALUES (NOW(), #{name}, #{productNo}, #{productCount})
+  </insert>
+
+  <!-- 동일상품 확인 -->
+  <select id = "checkSameProduct" parameterType="CartDto">
+    SELECT no
+    FROM cart
+    WHERE product_no = #{productNo} AND name = #{name}
+  </select>
+
+  <!-- 상품수량 수정 -->
+  <update id = "updateCart">
+    UPDATE cart
+    SET product_count = product_count + #{count}
+    WHERE no = #{no}
+
+  </update>
+
+  <!-- 카트에서 제외 -->
+  <delete id = "deleteCart">
+    DELETE
+    FROM cart
+    WHERE no = #{no}
+  </delete>
+
+  <!-- 카트 목록 확인 -->
+  <select id = "showCart" resultType="cartDto">
+    SELECT *
+    FROM cart
+    WHERE name=#{name}
+    ORDER BY no DESC
+
+  </select>
+
+  <select id="count" parameterType="SearchDto" resultType="int">
+    SELECT COUNT(*)
+    FROM cart
+    WHERE name = #{name}
+  </select>
+
+</mapper>

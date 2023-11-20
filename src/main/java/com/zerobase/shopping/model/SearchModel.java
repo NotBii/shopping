@@ -1,5 +1,6 @@
 package com.zerobase.shopping.model;
 
+import com.zerobase.shopping.commons.paging.Pagination;
 import com.zerobase.shopping.dto.SearchDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,12 +19,13 @@ public class SearchModel {
   private String searchType;
   private int delete;
   private int salesRate;
-
+  private Pagination pagination;
   public SearchDto toDto() {
     return SearchDto.builder()
         .page(this.page)
         .word(this.word)
         .searchType(this.searchType)
+        .pagination(this.pagination)
         .build();
   }
 

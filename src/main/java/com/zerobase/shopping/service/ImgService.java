@@ -3,8 +3,11 @@ package com.zerobase.shopping.service;
 import com.zerobase.shopping.dao.ImgDao;
 import com.zerobase.shopping.dto.ImgDto;
 import com.zerobase.shopping.model.ImgUpdateModel;
+import com.zerobase.shopping.model.ProductModel;
+import com.zerobase.shopping.commons.Utils;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImgService {
   private final String UPLOADPATH = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
   private final ImgDao imgDao;
+  private final Utils utils;
 
   /**
    * 이미지리스트 저장
@@ -119,29 +123,95 @@ public class ImgService {
       return fileNo;
     }
     imgDao.saveAll(imgs);
-
-    StringBuilder sb = new StringBuilder();
+    List<String> list= new ArrayList<>();
     for (ImgDto dto : imgs) {
-      sb.append(dto.getNo() + ",");
+      list.add(String.valueOf(dto.getNo()));
     }
-    sb.deleteCharAt(sb.length() - 1);
-    fileNo = sb.toString();
+    fileNo = String.join(",", list);
+
     log.info("fileno" + fileNo);
     return fileNo;
   }
 
+  /**
+   * 이미지 리스트 수정
+   * @param productModel 원글 정보
+   * @param multipartFiles
+   * @param imgUpdateModel 이미지 추가/삭제 여부
+   * @return 수정된 이미지 번호 리스트
+   */
   @Transactional
-  public String updateImg(final List<MultipartFile> multipartFiles, ImgUpdateModel imgUpdateModel) {
-    StringBuilder sb = new StringBuilder(imgUpdateModel.getUpdatedImgs());
+  public String updateImg(ProductModel productModel,
+      final List<MultipartFile> multipartFiles, ImgUpdateModel imgUpdateModel) {
 
+    StringBuilder sb = new StringBuilder(productModel.getImg());
     if (imgUpdateModel.getAdd()==1) {
-      List<ImgDto> imgs = uploadImgs(multipartFiles);
-      String fileNo = saveImgs(imgs);
+      List<ImgDto> newImgs = uploadImgs(multipartFiles);
+      String fileNo = saveImgs(newImgs);
       sb.append(",");
       sb.append(fileNo);
     }
         String result = sb.toString();
 
     return result;
+  }
+
+  /**
+   * 이미지 조회
+   * @param imgNo 이미지번호 목록 (리스트)
+   * @return 이미지DTO
+   */
+  public List<ImgDto> findAllByNo(final String imgNo) {
+    if (imgNo == null) {
+      return Collections.emptyList();
+    }
+    List<Long> list = utils.stringToList(imgNo);
+    return imgDao.findAllByNo(list);
+  }
+
+  /**
+   * DB에서 이미지 정보 삭제
+   * @param img 원글에 저장된 이미지번호 (문자열)
+   * @param imgNo 삭제할 이미지번호 목록 (리스트)
+   * @return 수정된 이미지번호(문자열)
+   */
+  @Transactional
+  public String deleteAllByNo(String img, final List<Long> imgNo) {
+    if (CollectionUtils.isEmpty(imgNo)) {
+      return img;
+    }
+    List<ImgDto> dtoList = imgDao.findAllByNo(imgNo);
+    deleteFiles(dtoList);
+    imgDao.deleteAllByNo(imgNo);
+    List<Long> list = utils.stringToList(img);
+    for (long no : imgNo) {
+      list.remove(no);
+    }
+
+    String result = list.toString().replaceAll("[\\[\\]]", "");
+    return result;
+  }
+
+  private void deleteFiles(final List<ImgDto> imgs) {
+    if (CollectionUtils.isEmpty(imgs)) {
+      return;
+    }
+    for (ImgDto img : imgs) {
+      String uploadedDate = img.getDate().toLocalDate().format(DateTimeFormatter.ofPattern("yyMMdd"));
+      deleteFile(uploadedDate, img.getSavedFileName());
+    }
+  }
+
+  private void deleteFile(final String addpath, final String filename) {
+    String filePath = Paths.get(UPLOADPATH, addpath, filename).toString();
+    deleteFile(filePath);
+  }
+
+  private void deleteFile(final String filePath) {
+    File file = new File(filePath);
+    if (file.exists()) {
+      file.delete();
+      log.info(filePath + " 삭제 완료");
+    }
   }
 }

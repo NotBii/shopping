@@ -9,4 +9,10 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface ImgDao {
   void saveAll(List<ImgDto> imgs);
+
+  List<ImgDto> findAllByNo(List<Long> no);
+
+  void deleteAllByNo(List<Long> no);
+
+
 }

@@ -1,21 +1,23 @@
 package com.zerobase.shopping.dto;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 
-public class ImgDto {
+public class OrderDetailsDto {
   private int no;
-  private String fileName;
-  private String savedFileName;
-  private Long size;
-  private LocalDateTime date;
+  private int orderNo;
+  private int productNo;
+  private int productPrice;
+  private int productCount;
+  private String name;
+  private String status;
+
 
 }

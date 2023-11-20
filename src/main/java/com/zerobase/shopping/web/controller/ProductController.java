@@ -1,8 +1,8 @@
 package com.zerobase.shopping.web.controller;
 
+import com.zerobase.shopping.commons.paging.PagingResponse;
 import com.zerobase.shopping.dto.ImgDto;
 import com.zerobase.shopping.dto.ProductDto;
-import com.zerobase.shopping.dto.SearchDto;
 import com.zerobase.shopping.model.ImgUpdateModel;
 import com.zerobase.shopping.model.ProductModel;
 import com.zerobase.shopping.model.SearchModel;
@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 
 public class ProductController {
-  private final ProductModel productModel;
   private final ProductService productService;
   private final ImgService imgService;
 
@@ -40,7 +38,7 @@ public class ProductController {
    * @return
    */
   @PostMapping("/save")
-  @PreAuthorize("ROLE_MANAGER")
+  @PreAuthorize("hasRole('ROLE_MANAGER')")
   public ResponseEntity<?> addProduct(@RequestPart(value = "imgs", required = false) List<MultipartFile> uploadImgs, @RequestPart(value = "ProductModel") ProductModel productModel) {
     if (uploadImgs != null) {
       List<ImgDto> imgs = imgService.uploadImgs(uploadImgs);
@@ -57,13 +55,19 @@ public class ProductController {
   /**상품상세보기
    *
    * @param no - 상품번호
-   * @return - productDto 반환
+   * @return - productDto, imgDto가 있는 해쉬맵 반환
    */
   @GetMapping("/product-detail")
   public ResponseEntity<?> productDetail(@RequestParam int no) {
-  ProductDto result = this.productService.getProductDetail(no);
+    HashMap<String, Object> result = new HashMap<>();
 
-  return ResponseEntity.ok(result);
+    ProductDto productDto = this.productService.getProductDetail(no);
+    List<ImgDto> imgDto = this.imgService.findAllByNo(productDto.getImg());
+    result.put("productDto", productDto);
+    result.put("imgDto", imgDto);
+
+    return ResponseEntity.ok(result);
+
   }
 
   /**상품목록보기
@@ -71,7 +75,7 @@ public class ProductController {
    * @param page - 현재 상품목록페이지
    * @param word  - 검색어
    * @param searchType - 검색타입(카테고리, 이름)
-   * @return - productDto 리스트 반환
+   * @return - productDto 목록 list, 페이징 정보 pagination 반환
    */
   @GetMapping("/product-list")
   public ResponseEntity<?> getProductList(@RequestParam(value ="page", required = false, defaultValue = "1") int page
@@ -83,7 +87,7 @@ public class ProductController {
         .searchType(searchType)
         .build();
     log.info(searchModel.toString());
-    List<ProductDto> result = this.productService.getProductList(searchModel.toDto());
+    PagingResponse<ProductDto> result = this.productService.getProductList(searchModel);
     return ResponseEntity.ok(result);
   }
 
@@ -91,17 +95,21 @@ public class ProductController {
    *
    * @param uploadImgs 사진을 추가할 경우 사용
    * @param productModel 수정된 글의 model
-   * @param imgUpdateModel 글에 첨부된 사진 목록의 추가 혹은 제거할 경우 사용, 사진 제거시 클라이언트에서 productDto의 imgs 에서 해당 번호 제거 후
-   *                       updatedImgs로 저장
+   * @param imgUpdateModel 글에 첨부된 사진 목록의 추가 혹은 제거할 경우 사용, 이미지 삭제시 removeNo(List)로 해당 번호 전달
    * @return
    */
   @PostMapping("/update")
-  @PreAuthorize("ROLE_MANAGER")
+  @PreAuthorize("hasRole('ROLE_MANAGER')")
   public ResponseEntity<?> updateProduct(@RequestPart(value = "imgs", required = false) List<MultipartFile> uploadImgs
-                                        ,@RequestPart(value = "product") ProductModel productModel
-                                        ,@RequestPart(value = "imgList") ImgUpdateModel imgUpdateModel) {
-    if (imgUpdateModel.getAdd()==1 || imgUpdateModel.getRemove()== 1) {
-      String updateImg = imgService.updateImg(uploadImgs, imgUpdateModel);
+                                        ,@RequestPart(value = "ProductModel") ProductModel productModel
+                                        ,@RequestPart(value = "ImgUpdateModel") ImgUpdateModel imgUpdateModel) {
+
+    if (imgUpdateModel.getRemove()==1) {
+      String deletedImg = this.imgService.deleteAllByNo(productModel.getImg(), imgUpdateModel.getRemoveNo());
+      productModel.setImg(deletedImg);
+    }
+    if (imgUpdateModel.getAdd()==1) {
+      String updateImg = this.imgService.updateImg(productModel, uploadImgs, imgUpdateModel);
       productModel.setImg(updateImg);
     }
 
@@ -116,11 +124,11 @@ public class ProductController {
    * @return
    */
   @DeleteMapping("/delete")
-  @PreAuthorize("ROLE_MANAGER")
+  @PreAuthorize("hasRole('ROLE_MANAGER')")
   public ResponseEntity<?> deleteProduct(@RequestParam int no) {
     this.productService.deleteProduct(no);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(no + " 삭제완료");
   }
 
 

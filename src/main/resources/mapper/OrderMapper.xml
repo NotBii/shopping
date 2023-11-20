@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zerobase.shopping.dao.OrderDao">
+  <!-- 주문정보 등록 -->
+  <insert id ="addOrder" parameterType="OrderDto" useGeneratedKeys="true" keyProperty="no">
+    INSERT INTO order_info(name, recipient, phone, cost, address )
+    VALUES (#{name}, #{recipient}, #{phone}, #{cost}, #{address})
+  </insert>
+
+  <!--주문상세 등록 -->
+  <insert id ="addOrderDetails" parameterType="OrderDetailsDto">
+    INSERT INTO order_details(order_no, product_no, product_price, product_count, name)
+    VALUES (#{orderNo}, #{productNo}, #{productPrice}, #{productCount}, #{name})
+  </insert>
+
+  <!--결제확인-->
+  <update id = "payCheck">
+    UPDATE order_info
+    SET paycheck = 1,
+        status = "결제완료"
+    WHERE no = #{no}
+  </update>
+
+  <!--상태변경-->
+  <update id = "updateStatus">
+    Update order_info
+    SET status = #{status}
+    WHERE no = #{no}
+  </update>
+</mapper>

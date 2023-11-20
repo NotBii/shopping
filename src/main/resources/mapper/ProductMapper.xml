@@ -14,11 +14,11 @@
     FROM product
     WHERE delete_yn = 0
     ORDER BY no DESC
-    LIMIT #{offset}, #{listSize}
+    LIMIT #{pagination.limitStart}, #{listSize}
   </select>
 
   <!-- 상품 상세보기 -->
-  <select id="getProductDetail" parameterType="long" resultType="ProductDto">
+  <select id="getProductDetail" resultType="ProductDto">
     SELECT *
     FROM product
     WHERE no = #{no}
@@ -32,19 +32,26 @@
         ,price = #{price}
         ,content = #{content}
         ,stock = #{stock}
+        ,img = #{img}
     WHERE no = #{no}
   </update>
 
   <!-- 상품 삭제 -->
   <delete id ="deleteProduct">
     UPDATE product
-    SET delete_yn = #{delete}
-    FROM product
+    SET delete_yn = 1
     WHERE no = #{no}
   </delete>
 
+  <!-- 재고 조회 -->
+  <select id = "checkProductStock">
+    SELECT stock
+    FROM product
+    WHERE no = #{no}
+  </select>
+
   <!-- 판매량 증가 -->
-  <update id = "updateSalesRate" parameterType="long">
+  <update id = "updateSalesRate">
     UPDATE product
     SET sales_rate = sales_rate + 1
     WHERE no = #{no}

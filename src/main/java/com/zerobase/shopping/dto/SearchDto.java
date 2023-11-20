@@ -1,5 +1,6 @@
 package com.zerobase.shopping.dto;
 
+import com.zerobase.shopping.commons.paging.Pagination;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class SearchDto {
   private final int pageSize = 10;
   private String word;
   private String searchType;
+  private Pagination pagination;
 
 
 

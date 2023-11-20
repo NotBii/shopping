@@ -5,17 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
-public class ImgDto {
+@Component
+public class CartDto {
   private int no;
-  private String fileName;
-  private String savedFileName;
-  private Long size;
   private LocalDateTime date;
+  private String name;
+  private int productNo;
+  private int productCount;
+
+
 
 }
