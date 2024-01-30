@@ -4,7 +4,7 @@ import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.dto.MailDto;
 import com.zerobase.shopping.model.AccountModel;
 import com.zerobase.shopping.security.TokenProvider;
-import com.zerobase.shopping.service.AccountService;
+import com.zerobase.shopping.service.MemberService;
 import com.zerobase.shopping.service.MailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,9 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/account")
 @RequiredArgsConstructor
 
-public class AccountController {
+public class MemberController {
 
-  private final AccountService accountService;
+  private final MemberService memberService;
   private final MailService mailService;
   private final TokenProvider tokenProvider;
 
@@ -42,7 +42,7 @@ public class AccountController {
   @PostMapping("/sign-up")
   public ResponseEntity<?> signUp(@RequestBody AccountModel.SignUp request) {
 
-    AccountDto result = this.accountService.signup(request);
+    AccountDto result = this.memberService.signup(request);
 
     return ResponseEntity.ok(result);
   }
@@ -50,7 +50,7 @@ public class AccountController {
   //로그인
   @PostMapping("/sign-in")
   public ResponseEntity<?> signIn(@RequestBody AccountModel.SignIn request) {
-    AccountDto account = this.accountService.authenticate(request);
+    AccountDto account = this.memberService.authenticate(request);
     String token = this.tokenProvider.generateToken(account.getUserId(), account.getRole());
 
     log.info("login");
@@ -74,7 +74,7 @@ public class AccountController {
   @GetMapping("/check-id")
   public ResponseEntity<?> idCheck(@RequestParam String userid) {
 
-    boolean result = this.accountService.idCheck(userid);
+    boolean result = this.memberService.idCheck(userid);
 
     return ResponseEntity.ok(result);
 
@@ -84,7 +84,7 @@ public class AccountController {
   @GetMapping ("/check-mail")
   public ResponseEntity<?> mailCheck(@RequestParam String mail) {
 
-    boolean result = this.accountService.mailCheck(mail);
+    boolean result = this.memberService.mailCheck(mail);
 
     return ResponseEntity.ok(result);
   }
@@ -93,7 +93,7 @@ public class AccountController {
   @GetMapping ("/check-nickname")
   public ResponseEntity<?> nicknameCheck(@RequestParam String nickname) {
 
-    boolean result = this.accountService.nicknameCheck(nickname);
+    boolean result = this.memberService.nicknameCheck(nickname);
 
     return ResponseEntity.ok(result);
   }
@@ -104,7 +104,7 @@ public class AccountController {
   @GetMapping ("/user-details")
   public ResponseEntity<?> userDetails(@RequestParam String userid) {
 
-    Optional<AccountDto> result = this.accountService.userDetails(userid);
+    Optional<AccountDto> result = this.memberService.userDetails(userid);
 
     return ResponseEntity.ok(result);
   }
@@ -113,7 +113,7 @@ public class AccountController {
   @PostMapping("/update-profile")
   public ResponseEntity<?> updateProfile(@RequestBody AccountDto accountDto) {
 
-    AccountDto result = this.accountService.updateProfile(accountDto);
+    AccountDto result = this.memberService.updateProfile(accountDto);
 
     return ResponseEntity.ok(result);
   }
@@ -122,14 +122,14 @@ public class AccountController {
   @DeleteMapping("/resign")
   public ResponseEntity<?> resign(@RequestBody AccountDto accountDto) {
 
-    AccountDto result = this.accountService.resign(accountDto);
+    AccountDto result = this.memberService.resign(accountDto);
 
     return ResponseEntity.ok(result);
   }
   //id 찾기
   @GetMapping("/find-id")
   public ResponseEntity<?> findId(@RequestParam String mail) {
-    String id = accountService.findId(mail);
+    String id = memberService.findId(mail);
     String result = "등록된 메일 주소가 존재하지 않습니다";
 
     if (StringUtils.hasLength(id)) {
@@ -146,7 +146,7 @@ public class AccountController {
 
     accountModel.setUserId(user.getUserId());
 
-  boolean result = accountService.checkPassword(accountModel);
+  boolean result = memberService.checkPassword(accountModel);
 
   return ResponseEntity.ok(result);
   }
@@ -157,7 +157,7 @@ public class AccountController {
 
     user.setPassword(request.getPassword());
     AccountDto accountDto = user.toDto();
-    accountService.changePassword(accountDto);
+    memberService.changePassword(accountDto);
 
     return ResponseEntity.ok(accountDto);
   }
@@ -166,7 +166,7 @@ public class AccountController {
   @GetMapping("/find-pw")
   public ResponseEntity<?> findPassword(@RequestParam String userid, String mail) {
 
-    String result = accountService.findPassword(userid, mail);
+    String result = memberService.findPassword(userid, mail);
 
     return ResponseEntity.ok(result);
   }

@@ -32,6 +32,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2'
 
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+
     //token
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'

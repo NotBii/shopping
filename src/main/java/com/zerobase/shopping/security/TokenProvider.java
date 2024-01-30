@@ -1,6 +1,6 @@
 package com.zerobase.shopping.security;
 
-import com.zerobase.shopping.service.AccountService;
+import com.zerobase.shopping.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 public class TokenProvider {
   private static final long TOKEN_EXPIRE_TIME = 1000 * 60 * 60;
   private static final String KEY_ROLES  = "role";
-  private final AccountService accountService;
+  private final MemberService memberService;
 
   @Value("{spring.jwt.secret}")
   private String secretKey;
@@ -78,7 +78,7 @@ public class TokenProvider {
   }
 
   public Authentication getAuthentication(String jwt) {
-    UserDetails userDetails = this.accountService.loadUserByUsername(this.getUserId(jwt));
+    UserDetails userDetails = this.memberService.loadUserByUsername(this.getUserId(jwt));
 
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }

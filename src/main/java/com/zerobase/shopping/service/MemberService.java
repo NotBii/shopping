@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AccountService implements UserDetailsService{
+public class MemberService implements UserDetailsService{
 
   private final AccountDao accountDao;
   private final AccountModel accountModel;
