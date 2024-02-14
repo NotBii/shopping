@@ -1,14 +1,12 @@
 package com.zerobase.shopping.web.controller;
 
 import com.zerobase.shopping.dto.CartDto;
-import com.zerobase.shopping.model.AccountModel;
+import com.zerobase.shopping.model.MemberModel;
 import com.zerobase.shopping.model.CartModel;
 import com.zerobase.shopping.service.CartService;
-import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +27,7 @@ public class CartController {
 
   @GetMapping("/addCart")
   public ResponseEntity<?> addCart(@RequestParam(value = "product-no") int productNo, @RequestParam(value = "count") int count,
-                            @AuthenticationPrincipal AccountModel user) {
+                            @AuthenticationPrincipal MemberModel user) {
     CartModel cartModel = CartModel.builder()
         .name(user.getUserId())
         .productNo(productNo)
@@ -42,14 +40,14 @@ public class CartController {
   }
 
   @PostMapping("/updateCart")
-  public ResponseEntity<?> updateCart(@RequestBody CartModel cartModel, @AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<?> updateCart(@RequestBody CartModel cartModel, @AuthenticationPrincipal MemberModel user) {
     cartModel.setName(user.getUserId());
     cartService.updateCart(cartModel.toDto());
     return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("/deleteCart")
-  public ResponseEntity<?> deleteCart(@RequestBody CartModel cartModel, @AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<?> deleteCart(@RequestBody CartModel cartModel, @AuthenticationPrincipal MemberModel user) {
     cartModel.setName(user.getUserId());
     log.info(cartModel.toString());
     cartService.deleteCart(cartModel.toDto());
@@ -57,7 +55,7 @@ public class CartController {
   }
 
   @GetMapping("/showCart")
-  public ResponseEntity<?> showCart(@AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<?> showCart(@AuthenticationPrincipal MemberModel user) {
 
     Optional<CartDto> result = cartService.showCart(user.getUserId());
 

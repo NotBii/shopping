@@ -1,4 +1,4 @@
-package com.zerobase.shopping.domain;
+package com.zerobase.shopping.member.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,9 +22,9 @@ public class MemberEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long memberId;
-  private String userId;
+  private String username;
   private String password;
-  private String nickName;
+  private String nickname;
   private String mail;
   private String role;
   private String date;

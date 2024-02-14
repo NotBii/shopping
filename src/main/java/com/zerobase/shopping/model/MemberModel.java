@@ -22,8 +22,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Builder
 @Component
-
-public class AccountModel implements UserDetails {
+public class MemberModel implements UserDetails {
 
   private int no;
   private String userId;

@@ -1,6 +1,6 @@
 package com.zerobase.shopping.security;
 
-import com.zerobase.shopping.service.MemberService;
+import com.zerobase.shopping.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

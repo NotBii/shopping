@@ -109,6 +109,6 @@ public class OrderService {
 
   public void updateStatus(OrderModel orderModel) {
     log.info(orderModel.getNo() + "status 수정");
-    this.orderDao.updateStatus(orderModel.toDto());
+//    this.orderDao.updateStatus(orderModel.toDto());
   }
 }

@@ -1,18 +1,14 @@
 package com.zerobase.shopping.web.controller;
 
 import com.zerobase.shopping.dto.CartDto;
-import com.zerobase.shopping.dto.OrderDetailsDto;
-import com.zerobase.shopping.model.AccountModel;
+import com.zerobase.shopping.model.MemberModel;
 import com.zerobase.shopping.model.OrderDetailsModel;
 import com.zerobase.shopping.model.OrderModel;
-import com.zerobase.shopping.service.CartService;
 import com.zerobase.shopping.service.OrderService;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +36,7 @@ public class OrderController {
   @PostMapping("/product-order")
   public ResponseEntity<?> orderProduct(@RequestPart(value ="order-model") OrderModel orderModel
       ,@RequestPart(value ="order-details") OrderDetailsModel orderDetailsModel
-      ,@AuthenticationPrincipal AccountModel user) {
+      ,@AuthenticationPrincipal MemberModel user) {
     orderModel.setName(user.getUserId());
     orderDetailsModel.setName(user.getUserId());
 
@@ -59,7 +55,7 @@ public class OrderController {
   @PostMapping("/cart-order")
   public ResponseEntity<?> orderCart(@RequestPart(value="cart") List<CartDto> cart,
       @RequestPart(value="order-model") OrderModel orderModel,
-      @AuthenticationPrincipal AccountModel user) {
+      @AuthenticationPrincipal MemberModel user) {
     orderModel.setName(user.getUserId());
 
     String result = this.orderService.addCartOrder(cart, orderModel);
@@ -75,7 +71,7 @@ public class OrderController {
    */
   @GetMapping("/pay-check")
   @PreAuthorize("hasRole('ROLE_MANAGER')")
-  public ResponseEntity<?> paycheck(@RequestParam int no, @AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<?> paycheck(@RequestParam int no, @AuthenticationPrincipal MemberModel user) {
     this.orderService.payCheck(no);
 
     return ResponseEntity.ok(null);

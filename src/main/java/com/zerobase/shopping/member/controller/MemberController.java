@@ -1,10 +1,14 @@
-package com.zerobase.shopping.web.controller;
+package com.zerobase.shopping.member.controller;
 
 import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.dto.MailDto;
-import com.zerobase.shopping.model.AccountModel;
+import com.zerobase.shopping.member.dto.MemberDto;
+import com.zerobase.shopping.member.dto.MemberResponse;
+import com.zerobase.shopping.member.dto.SignInRequest;
+import com.zerobase.shopping.member.dto.SignUpRequest;
+import com.zerobase.shopping.model.MemberModel;
 import com.zerobase.shopping.security.TokenProvider;
-import com.zerobase.shopping.service.MemberService;
+import com.zerobase.shopping.member.service.MemberService;
 import com.zerobase.shopping.service.MailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,20 +44,20 @@ public class MemberController {
 
   //회원가입
   @PostMapping("/sign-up")
-  public ResponseEntity<?> signUp(@RequestBody AccountModel.SignUp request) {
+  public ResponseEntity<?> signUp(@RequestBody SignUpRequest request) {
 
-    AccountDto result = this.memberService.signup(request);
+    MemberDto result = this.memberService.signup(request);
 
     return ResponseEntity.ok(result);
   }
 
   //로그인
   @PostMapping("/sign-in")
-  public ResponseEntity<?> signIn(@RequestBody AccountModel.SignIn request) {
-    AccountDto account = this.memberService.authenticate(request);
-    String token = this.tokenProvider.generateToken(account.getUserId(), account.getRole());
+  public ResponseEntity<?> signIn(@RequestBody SignInRequest request) {
+    MemberResponse user = this.memberService.authenticate(request);
+    String token = this.tokenProvider.generateToken(user.getUsername(), user.getRole());
 
-    log.info("login");
+    log.info(user.getUsername() + " login");
     return ResponseEntity.ok(token);
   }
 
@@ -142,18 +146,18 @@ public class MemberController {
   }
   //비밀번호체크 api
   @PostMapping("/check-pw")
-  public ResponseEntity<?> checkPassword(@RequestBody AccountModel accountModel, @AuthenticationPrincipal AccountModel user ) {
+  public ResponseEntity<?> checkPassword(@RequestBody MemberModel memberModel, @AuthenticationPrincipal MemberModel user ) {
 
-    accountModel.setUserId(user.getUserId());
+    memberModel.setUserId(user.getUserId());
 
-  boolean result = memberService.checkPassword(accountModel);
+  boolean result = memberService.checkPassword(memberModel);
 
   return ResponseEntity.ok(result);
   }
 
   //비밀번호변경
   @PostMapping("/change-pw")
-  public ResponseEntity<?> changePassword(@RequestBody AccountDto request, @AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<?> changePassword(@RequestBody AccountDto request, @AuthenticationPrincipal MemberModel user) {
 
     user.setPassword(request.getPassword());
     AccountDto accountDto = user.toDto();
