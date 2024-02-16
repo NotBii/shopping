@@ -1,14 +1,17 @@
 package com.zerobase.shopping.member.service;
 
-import com.zerobase.shopping.exception.impl.MemberNotFound;
-import com.zerobase.shopping.exception.impl.PasswordNotMatches;
+import com.zerobase.shopping.commons.exception.impl.DuplicatedMail;
+import com.zerobase.shopping.commons.exception.impl.DuplicatedNickname;
+import com.zerobase.shopping.commons.exception.impl.DuplicatedUsername;
+import com.zerobase.shopping.commons.exception.impl.MemberNotFound;
+import com.zerobase.shopping.commons.exception.impl.PasswordNotMatches;
+import com.zerobase.shopping.member.dto.MemberDetails;
 import com.zerobase.shopping.member.dto.MemberResponse;
 import com.zerobase.shopping.member.dto.SignInRequest;
 import com.zerobase.shopping.member.dto.SignUpRequest;
 import com.zerobase.shopping.member.entity.MemberEntity;
 import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.dao.AccountDao;
-import com.zerobase.shopping.member.dto.MemberDto;
 import com.zerobase.shopping.model.MemberModel;
 import com.zerobase.shopping.member.repository.MemberRepository;
 import com.zerobase.shopping.service.MailService;
@@ -17,9 +20,13 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+//TODO : 비밀번호 정규식, 로그아웃
+
 
 @Slf4j
 @Service
@@ -27,40 +34,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService implements UserDetailsService {
 
   private final MemberRepository memberRepository;
-  private final AccountDao accountDao;
-  private final MemberModel memberModel;
   private final MailService mailService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public MemberDto loadUserByUsername(String username) {
-    MemberEntity memberEntity = this.memberRepository.findByUsername(username)
-        .orElseThrow(MemberNotFound::new);
+  public MemberDetails loadUserByUsername(String username) {
+    MemberEntity entity = getMemberEntity(username);
 
-    MemberDto dto = MemberDto.builder()
-        .memberId(memberEntity.getMemberId())
-        .username(memberEntity.getUsername())
-        .role(memberEntity.getRole())
-        .mail(memberEntity.getRole())
-        .nickname(memberEntity.getNickname())
-        .password(memberEntity.getPassword())
-        .build();
 
-    log.info(dto.getUsername() + "정보 로드");
-    return dto;
+    log.info(username + "정보 로드");
+    return MemberDetails.toDto(entity);
   }
 
   //회원가입
-  public MemberDto signup(SignUpRequest request) {
+  public MemberResponse signup(SignUpRequest request) {
 
     request.setPassword((this.passwordEncoder.encode(request.getPassword())));
     MemberEntity entity = request.toEntity();
     memberRepository.save(entity);
 
-    return MemberDto.toDto(entity);
+    return MemberResponse.getMemberResponse(entity);
   }
 
   //로그인
+  //TODO sout 정리하기
   @Transactional
   public MemberResponse authenticate(SignInRequest request) {
 
@@ -70,102 +67,109 @@ public class MemberService implements UserDetailsService {
     if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       throw new PasswordNotMatches();
     }
-
+    System.out.println(user.getUsername());
     return MemberResponse.getMemberResponse(user);
   }
 
+  //로그아웃
+//  @Transactional
+//  public void signout(String token, String username) {
+//    TokenProvider.
+//  }
   //id 중복체크
-  public boolean idCheck(String userId) {
-    return this.accountDao.idCheck(userId);
+  public void idCheck(String username) {
+    Optional<MemberEntity> op = memberRepository.findByUsername(username);
+    if (op.isPresent()) {
+      throw new DuplicatedUsername();
+    }
+
   }
 
   //mail 중복체크
-
-  public boolean mailCheck(String mail) {
-    boolean result = this.accountDao.mailCheck(mail);
-    return result;
+  public void mailCheck(String mail) {
+    Optional<MemberEntity> op = memberRepository.findByMail(mail);
+    if (op.isPresent()) {
+      throw new DuplicatedMail();
+    }
   }
 
   //닉네임 중복체크
 
-  public boolean nicknameCheck(String nickname) {
-    boolean result = this.accountDao.nickNameCheck(nickname);
-    return result;
+  public void nicknameCheck(String nickname) {
+    Optional<MemberEntity> op = memberRepository.findByNickname(nickname);
+    if (op.isPresent()) {
+      throw new DuplicatedNickname();
+    }
   }
 
   //회원정보 조회
 
-  public Optional<AccountDto> userDetails(String userId) {
-    Optional<AccountDto> result = this.accountDao.userDetails(userId);
-    return result;
+  public MemberDetails memberDetails(String username) {
+    MemberEntity entity = memberRepository.findByUsername(username)
+        .orElseThrow(MemberNotFound::new);
+
+
+    return MemberDetails.toDto(entity);
   }
 
   //비밀번호 체크
-  public boolean checkPassword(MemberModel request) {
-    AccountDto user = this.accountDao.checkPassword(request.getUserId()).get();
-    boolean result = (this.passwordEncoder.matches(request.getPassword(), user.getPassword()));
-    return result;
+  public void checkPassword(SignInRequest request, String username) {
+    MemberEntity entity = getMemberEntity(username);
+    if (!this.passwordEncoder.matches(request.getPassword(), entity.getPassword()))
+    {
+      throw new PasswordNotMatches();
+    }
   }
+
+
+  //비밀번호 변경
+  @Transactional
+  public void changePassword(SignInRequest request, String username) {
+    MemberEntity entity = getMemberEntity(username);
+    String newPw = passwordEncoder.encode(request.getPassword());
+    entity.changePw(newPw);
+    memberRepository.save(entity);
+
+    log.info("비밀번호 변경");
+  }
+
 
   //회원정보 수정
-  public AccountDto updateProfile(AccountDto accountDto) {
-    this.accountDao.updateProfile(accountDto);
+  public MemberDetails updateProfile(MemberDetails memberDetails) {
+    MemberEntity entity = getMemberEntity(memberDetails.getUsername());
+    entity.updateProfile(memberDetails);
+    memberRepository.save(entity);
 
-    return accountDto;
+    return MemberDetails.toDto(entity);
   }
-
+  @Transactional
   //회원정보 삭제
-
-  public AccountDto resign(AccountDto accountDto) {
-    this.accountDao.resign(accountDto);
-
-    return accountDto;
+  //TODO 주문 등 타 테이블 같이삭제하도록
+  public void resign(SignInRequest request) {
+    authenticate(request);
+    memberRepository.deleteMemberEntityByUsername(request.getUsername());
+    log.info(request.getUsername() + "탈퇴완료");
   }
 
   //메일주소로 userId찾기
   public String findId(String mail) {
-    String userId = this.accountDao.findId(mail);
 
-    return userId;
+    return memberRepository.findByMail(mail).orElseThrow(MemberNotFound::new).getUsername();
   }
 
-  //비밀번호 변경
+  @Transactional
+//  userId, 메일주소로 비밀번호 초기화
+  public void findPassword(String username, String mail) {
+    MemberEntity entity = memberRepository.findByUsernameAndMail(username, mail).orElseThrow(MemberNotFound::new);
 
-  public void changePassword(AccountDto accountDto) {
-    log.info("비밀번호 변경");
-    this.accountDao.changePassword(accountDto);
-  }
+    String tempPassword = getTempPassword();
+    entity.changePw(tempPassword);
+    MemberDetails member = MemberDetails.toDto(entity);
 
+    mailService.findPassword(member, tempPassword);
 
-  //userId, 메일주소로 비밀번호 초기화
-  public String findPassword(String userId, String mail) {
-    Optional<AccountDto> request = this.accountDao.findPassword(userId, mail);
-    String result = "";
+    log.info("임시 비밀번호 발급" + username);
 
-    if (!request.isEmpty()) {
-      String tempPassword = getTempPassword();
-      AccountDto requestDto = request.get();
-
-      log.info(requestDto.getUserId());
-
-      MemberModel model = MemberModel.builder()
-          .userId(requestDto.getUserId())
-          .password(this.passwordEncoder.encode(tempPassword))
-          .mail(requestDto.getMail())
-          .build();
-      log.info("model" + model);
-      AccountDto accountDto = model.toDto();
-      log.info("modeltoDTO" + accountDto);
-      this.changePassword(accountDto);
-      mailService.findPassword(accountDto, tempPassword);
-      result = "임시 비밀번호 발송 성공";
-      log.info("비밀번호 변경" + userId);
-
-    } else {
-      result = "ID와 메일 주소를 확인해 주세요";
-    }
-
-    return result;
   }
 
   //랜덤비밀번호 로직
@@ -188,5 +192,9 @@ public class MemberService implements UserDetailsService {
     return sb.toString();
   }
 
+  //memberentity 호출
 
+  private MemberEntity getMemberEntity(String username) {
+    return memberRepository.findByUsername(username).orElseThrow(MemberNotFound::new);
+  }
 }

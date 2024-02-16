@@ -47,14 +47,12 @@ public class TokenProvider {
         .compact();
   }
 
-  public String getUserId(String token) {
-    String userId = this.parseClaims(token).getSubject();
-    return userId;
+  public String getUsername(String token) {
+    return this.parseClaims(token).getSubject();
   }
 
   public String getKeyRoles(String token) {
-    String role = (String) this.parseClaims(token).get("role");
-    return role;
+    return (String) this.parseClaims(token).get("role");
   }
 
   //토큰유효성검증
@@ -78,9 +76,10 @@ public class TokenProvider {
   }
 
   public Authentication getAuthentication(String jwt) {
-    UserDetails userDetails = this.memberService.loadUserByUsername(this.getUserId(jwt));
+    UserDetails userDetails = this.memberService.loadUserByUsername(this.getUsername(jwt));
 
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
+
 
 }

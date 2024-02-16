@@ -33,7 +33,7 @@ public class SecurityConfiguration {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(request -> request
                 .requestMatchers( "/account/sign-up", "/account/sign-in", "/account/check-id", "/account/check-mail", "/account/check-nickname", "/account/find-id", "/account/find-pw",
-                "/product/product-detail/**", "/product-list"
+                "/product/product-detail/**", "/product-list", "/"
                 ).permitAll())
         .authorizeHttpRequests(request -> request.anyRequest().authenticated())
         .logout((logout) -> logout

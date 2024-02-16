@@ -2,24 +2,17 @@ package com.zerobase.shopping.member.controller;
 
 import com.zerobase.shopping.dto.AccountDto;
 import com.zerobase.shopping.dto.MailDto;
-import com.zerobase.shopping.member.dto.MemberDto;
+import com.zerobase.shopping.member.dto.MemberDetails;
 import com.zerobase.shopping.member.dto.MemberResponse;
 import com.zerobase.shopping.member.dto.SignInRequest;
 import com.zerobase.shopping.member.dto.SignUpRequest;
-import com.zerobase.shopping.model.MemberModel;
 import com.zerobase.shopping.security.TokenProvider;
 import com.zerobase.shopping.member.service.MemberService;
 import com.zerobase.shopping.service.MailService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +39,7 @@ public class MemberController {
   @PostMapping("/sign-up")
   public ResponseEntity<?> signUp(@RequestBody SignUpRequest request) {
 
-    MemberDto result = this.memberService.signup(request);
+    MemberResponse result = this.memberService.signup(request);
 
     return ResponseEntity.ok(result);
   }
@@ -62,25 +55,30 @@ public class MemberController {
   }
 
   //로그아웃
-  @GetMapping("/logout")
-  public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-    if (auth != null) {
-      new SecurityContextLogoutHandler().logout(request, response, auth);
-    }
-
-    return ResponseEntity.ok("로그아웃되었습니다");
-
-  }
+//  @GetMapping("/logout")
+//  public ResponseEntity<?> logout(@AuthenticationPrincipal MemberDto memberDto, HttpServletRequest request, HttpServletResponse response) {
+//    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//    if (memberDto != null) {
+//      String accessToken = jwtAuthenticationFilter.resolveTokenFromRequest(request);
+//      memberService.signout(accessToken, memberDto.getUsername());
+//    }
+//    if (auth != null) {
+//      System.out.println("lout");
+//      new SecurityContextLogoutHandler().logout(request, response, auth);
+//    }
+//    System.out.println("no");
+//
+//    return ResponseEntity.ok("로그아웃되었습니다");
+//
+//  }
 
   //id 중복체크
   @GetMapping("/check-id")
-  public ResponseEntity<?> idCheck(@RequestParam String userid) {
+  public ResponseEntity<?> idCheck(@RequestParam String username) {
 
-    boolean result = this.memberService.idCheck(userid);
+    memberService.idCheck(username);
 
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok("사용가능한 아이디입니다");
 
   }
 
@@ -88,47 +86,66 @@ public class MemberController {
   @GetMapping ("/check-mail")
   public ResponseEntity<?> mailCheck(@RequestParam String mail) {
 
-    boolean result = this.memberService.mailCheck(mail);
+    memberService.mailCheck(mail);
 
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok("사용가능한 메일주소입니다");
   }
 
   //닉네임 중복체크
   @GetMapping ("/check-nickname")
   public ResponseEntity<?> nicknameCheck(@RequestParam String nickname) {
 
-    boolean result = this.memberService.nicknameCheck(nickname);
+    memberService.nicknameCheck(nickname);
 
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok("사용가능한 닉네임입니다");
   }
 
 
 
   //회원 정보 조회
-  @GetMapping ("/user-details")
-  public ResponseEntity<?> userDetails(@RequestParam String userid) {
+  @GetMapping ("/member-details")
+  public ResponseEntity<?> memberDetails(@RequestParam String username) {
 
-    Optional<AccountDto> result = this.memberService.userDetails(userid);
+    MemberDetails result = memberService.memberDetails(username);
 
     return ResponseEntity.ok(result);
   }
 
+  //비밀번호체크(fh api
+  @PostMapping("/check-pw")
+  public ResponseEntity<?> checkPassword(@RequestBody SignInRequest request, @AuthenticationPrincipal MemberDetails user ) {
+
+    memberService.checkPassword(request, user.getUsername());
+
+    return ResponseEntity.ok("비밀번호가 일치합니다");
+  }
+
+  //비밀번호변경
+  @PostMapping("/change-pw")
+  public ResponseEntity<?> changePassword(@RequestBody SignInRequest request, @AuthenticationPrincipal MemberDetails user) {
+
+    memberService.changePassword(request, user.getUsername());
+
+    return ResponseEntity.ok("변경완료");
+  }
+
+
   //회원 정보 수정
   @PostMapping("/update-profile")
-  public ResponseEntity<?> updateProfile(@RequestBody AccountDto accountDto) {
+  public ResponseEntity<?> updateProfile(@RequestBody MemberDetails memberDetails) {
 
-    AccountDto result = this.memberService.updateProfile(accountDto);
+    MemberDetails result = memberService.updateProfile(memberDetails);
 
     return ResponseEntity.ok(result);
   }
 
   //회원 탈퇴
   @DeleteMapping("/resign")
-  public ResponseEntity<?> resign(@RequestBody AccountDto accountDto) {
+  public ResponseEntity<?> resign(@RequestBody SignInRequest request) {
 
-    AccountDto result = this.memberService.resign(accountDto);
+    memberService.resign(request);
 
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok("탈퇴 완료");
   }
   //id 찾기
   @GetMapping("/find-id")
@@ -144,34 +161,14 @@ public class MemberController {
 
     return ResponseEntity.ok(result);
   }
-  //비밀번호체크 api
-  @PostMapping("/check-pw")
-  public ResponseEntity<?> checkPassword(@RequestBody MemberModel memberModel, @AuthenticationPrincipal MemberModel user ) {
 
-    memberModel.setUserId(user.getUserId());
-
-  boolean result = memberService.checkPassword(memberModel);
-
-  return ResponseEntity.ok(result);
-  }
-
-  //비밀번호변경
-  @PostMapping("/change-pw")
-  public ResponseEntity<?> changePassword(@RequestBody AccountDto request, @AuthenticationPrincipal MemberModel user) {
-
-    user.setPassword(request.getPassword());
-    AccountDto accountDto = user.toDto();
-    memberService.changePassword(accountDto);
-
-    return ResponseEntity.ok(accountDto);
-  }
 
   //pw 찾기
   @GetMapping("/find-pw")
-  public ResponseEntity<?> findPassword(@RequestParam String userid, String mail) {
+  public ResponseEntity<?> findPassword(@RequestParam String username, String mail) {
 
-    String result = memberService.findPassword(userid, mail);
+    memberService.findPassword(username, mail);
 
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok("가입된 메일주소로 임시비밀번호가 발송되었습니다.");
   }
 }
