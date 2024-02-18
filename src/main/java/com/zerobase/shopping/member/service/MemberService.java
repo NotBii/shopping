@@ -1,5 +1,7 @@
 package com.zerobase.shopping.member.service;
 
+import com.zerobase.shopping.cart.entity.CartEntity;
+import com.zerobase.shopping.cart.repository.CartRepository;
 import com.zerobase.shopping.commons.exception.impl.DuplicatedMail;
 import com.zerobase.shopping.commons.exception.impl.DuplicatedNickname;
 import com.zerobase.shopping.commons.exception.impl.DuplicatedUsername;
@@ -10,17 +12,13 @@ import com.zerobase.shopping.member.dto.MemberResponse;
 import com.zerobase.shopping.member.dto.SignInRequest;
 import com.zerobase.shopping.member.dto.SignUpRequest;
 import com.zerobase.shopping.member.entity.MemberEntity;
-import com.zerobase.shopping.dto.AccountDto;
-import com.zerobase.shopping.dao.AccountDao;
-import com.zerobase.shopping.model.MemberModel;
 import com.zerobase.shopping.member.repository.MemberRepository;
-import com.zerobase.shopping.service.MailService;
+import com.zerobase.shopping.mail.service.MailService;
 import java.security.SecureRandom;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService implements UserDetailsService {
 
   private final MemberRepository memberRepository;
+  private final CartRepository cartRepository;
   private final MailService mailService;
   private final PasswordEncoder passwordEncoder;
 
@@ -41,15 +40,19 @@ public class MemberService implements UserDetailsService {
   public MemberDetails loadUserByUsername(String username) {
     MemberEntity entity = getMemberEntity(username);
 
-
     log.info(username + "정보 로드");
+
     return MemberDetails.toDto(entity);
   }
 
   //회원가입
+  @Transactional
   public MemberResponse signup(SignUpRequest request) {
 
     request.setPassword((this.passwordEncoder.encode(request.getPassword())));
+    CartEntity cartEntity = CartEntity.builder().build();
+    cartRepository.save(cartEntity);
+    request.setCart(cartEntity);
     MemberEntity entity = request.toEntity();
     memberRepository.save(entity);
 
@@ -67,7 +70,6 @@ public class MemberService implements UserDetailsService {
     if (!this.passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       throw new PasswordNotMatches();
     }
-    System.out.println(user.getUsername());
     return MemberResponse.getMemberResponse(user);
   }
 
@@ -144,7 +146,6 @@ public class MemberService implements UserDetailsService {
   }
   @Transactional
   //회원정보 삭제
-  //TODO 주문 등 타 테이블 같이삭제하도록
   public void resign(SignInRequest request) {
     authenticate(request);
     memberRepository.deleteMemberEntityByUsername(request.getUsername());
@@ -194,7 +195,7 @@ public class MemberService implements UserDetailsService {
 
   //memberentity 호출
 
-  private MemberEntity getMemberEntity(String username) {
+  public MemberEntity getMemberEntity(String username) {
     return memberRepository.findByUsername(username).orElseThrow(MemberNotFound::new);
   }
 }

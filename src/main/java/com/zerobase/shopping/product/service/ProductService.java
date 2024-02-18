@@ -1,17 +1,12 @@
 package com.zerobase.shopping.product.service;
 
 import com.zerobase.shopping.commons.exception.impl.NoResult;
-import com.zerobase.shopping.commons.paging.Pagination;
-import com.zerobase.shopping.commons.paging.PagingResponse;
-import com.zerobase.shopping.dto.ProductDto;
-import com.zerobase.shopping.model.SearchModel;
 import com.zerobase.shopping.product.dto.CreateProduct;
 import com.zerobase.shopping.product.dto.ProductDetail;
 import com.zerobase.shopping.product.dto.SearchOption;
 import com.zerobase.shopping.product.entity.ProductEntity;
 import com.zerobase.shopping.product.repository.ProductRepository;
 import java.time.LocalDateTime;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,7 +30,7 @@ public class ProductService {
    * @return 등록된 번호
    */
   public Long saveProduct(CreateProduct dto) {
-    dto.setDate(LocalDateTime.now());
+    dto.setCreatedDate(LocalDateTime.now());
     ProductEntity entity = productEntityConverter.createProductToEntity(dto);
     productRepository.save(entity);
 
@@ -93,7 +88,7 @@ public class ProductService {
     }
   }
 
-   private ProductEntity getProductEntity(Long productId) {
+   public ProductEntity getProductEntity(Long productId) {
     return productRepository.findByProductId(productId).orElseThrow(NoResult::new);
   }
 }

@@ -1,26 +1,36 @@
 package com.zerobase.shopping.product.dto;
 
-import com.zerobase.shopping.imgUpload.dto.ImgDto;
+import com.zerobase.shopping.img.dto.ImgDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
+import lombok.Setter;
 
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateProduct {
+
   private long productId;
+
   private long price;
+
   private String title;
+
   private String content;
+
   private int stock;
-  private LocalDateTime date;
+
+  private LocalDateTime createdDate;
+
   private LocalDateTime modifiedDate;
+
   private List<ImgDto> imgList;
 
 }

@@ -24,7 +24,7 @@ public class MemberDetails implements UserDetails {
 
   private long memberId;
   private String username;
-  private String password;
+//  private String password;
   private String nickname;
   private String mail;
   private String role;
@@ -64,6 +64,9 @@ public class MemberDetails implements UserDetails {
   @Override
   public String getPassword() {return null;}
 
+  public String getAuth() {
+    return this.getRole();
+  }
 
 
   public static MemberDetails toDto(MemberEntity entity) {
@@ -72,7 +75,7 @@ public class MemberDetails implements UserDetails {
         .nickname(entity.getNickname())
         .mail(entity.getMail())
         .role(entity.getRole())
-        .regDate(entity.getRegDate())
+        .regDate(entity.getCreatedDate())
         .build();
   }
 

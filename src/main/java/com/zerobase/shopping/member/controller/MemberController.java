@@ -1,14 +1,13 @@
 package com.zerobase.shopping.member.controller;
 
-import com.zerobase.shopping.dto.AccountDto;
-import com.zerobase.shopping.dto.MailDto;
+import com.zerobase.shopping.mail.dto.MailDto;
 import com.zerobase.shopping.member.dto.MemberDetails;
 import com.zerobase.shopping.member.dto.MemberResponse;
 import com.zerobase.shopping.member.dto.SignInRequest;
 import com.zerobase.shopping.member.dto.SignUpRequest;
-import com.zerobase.shopping.security.TokenProvider;
+import com.zerobase.shopping.commons.security.TokenProvider;
 import com.zerobase.shopping.member.service.MemberService;
-import com.zerobase.shopping.service.MailService;
+import com.zerobase.shopping.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

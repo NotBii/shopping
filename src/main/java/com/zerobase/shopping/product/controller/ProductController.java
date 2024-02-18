@@ -1,21 +1,15 @@
 package com.zerobase.shopping.product.controller;
 
-import com.zerobase.shopping.commons.paging.PagingResponse;
-import com.zerobase.shopping.imgUpload.dto.ImgDto;
-import com.zerobase.shopping.dto.ProductDto;
-import com.zerobase.shopping.model.SearchModel;
-import com.zerobase.shopping.imgUpload.service.ImgService;
+import com.zerobase.shopping.img.service.ImgService;
 import com.zerobase.shopping.product.dto.CreateProduct;
 import com.zerobase.shopping.product.dto.ProductDetail;
 import com.zerobase.shopping.product.dto.SearchOption;
 import com.zerobase.shopping.product.service.ProductService;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,10 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor
-
 public class ProductController {
   private final ProductService productService;
-  private final ImgService imgService;
 
   /**상품등록
    *

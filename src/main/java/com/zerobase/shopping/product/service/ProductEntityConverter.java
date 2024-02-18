@@ -1,9 +1,10 @@
 package com.zerobase.shopping.product.service;
 
-import com.zerobase.shopping.imgUpload.service.ImgEntityConverter;
-import com.zerobase.shopping.imgUpload.service.ImgService;
+import com.zerobase.shopping.img.service.ImgEntityConverter;
+import com.zerobase.shopping.img.service.ImgService;
 import com.zerobase.shopping.product.dto.CreateProduct;
 import com.zerobase.shopping.product.dto.ProductDetail;
+import com.zerobase.shopping.product.dto.ProductSummary;
 import com.zerobase.shopping.product.entity.ProductEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ public class ProductEntityConverter {
         .title(dto.getTitle())
         .content(dto.getContent())
         .stock(dto.getStock())
-        .date(dto.getDate())
+        .createdDate(dto.getCreatedDate())
         .modifiedDate(dto.getModifiedDate())
         .imgList(imgService.getImgEntityList(dto.getImgList()))
         .build();
@@ -34,9 +35,20 @@ public class ProductEntityConverter {
         .title(entity.getTitle())
         .content(entity.getContent())
         .stock(entity.getStock())
-        .date(entity.getDate())
+        .createdDate(entity.getCreatedDate())
         .modifiedDate(entity.getModifiedDate())
         .imgList(ImgEntityConverter.entityListToDtoList(entity.getImgList()))
+        .build();
+  }
+
+  public ProductSummary toProductSummary(ProductEntity entity) {
+    return ProductSummary.builder()
+        .productId(entity.getProductId())
+        .price(entity.getPrice())
+        .title(entity.getTitle())
+        .stock(entity.getStock())
+        .createdDate(entity.getCreatedDate())
+        .img(ImgEntityConverter.getFirstImgDto(entity.getImgList()))
         .build();
   }
 

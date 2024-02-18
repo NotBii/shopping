@@ -1,5 +1,6 @@
 package com.zerobase.shopping.member.dto;
 
+import com.zerobase.shopping.cart.entity.CartEntity;
 import com.zerobase.shopping.member.entity.MemberEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ public class SignUpRequest {
   private String nickname;
   private String mail;
   private String role;
+  private CartEntity cart;
 
   public MemberEntity toEntity() {
     return MemberEntity.builder()
@@ -27,6 +29,7 @@ public class SignUpRequest {
         .password(this.password)
         .nickname(this.nickname)
         .mail(this.mail)
+        .cart(this.cart)
         .role(this.role)
         .build();
   }

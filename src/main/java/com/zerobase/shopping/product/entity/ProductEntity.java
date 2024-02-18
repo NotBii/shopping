@@ -1,6 +1,7 @@
 package com.zerobase.shopping.product.entity;
 
-import com.zerobase.shopping.imgUpload.entity.ImgEntity;
+import com.zerobase.shopping.img.entity.ImgEntity;
+import com.zerobase.shopping.img.service.ImgService;
 import com.zerobase.shopping.product.dto.CreateProduct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,13 +9,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Table(name = "product")
@@ -30,15 +37,29 @@ public class ProductEntity  {
   private String title;
   private String content;
   private int stock;
-  private LocalDateTime date;
+  @CreatedDate
+  private LocalDateTime createdDate;
+  @LastModifiedDate
   private LocalDateTime modifiedDate;
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "productId")
   private List<ImgEntity> imgList;
-  private int deleteYn;
+  @Default
+  private int deleteYn = 0;
 
   public void changeDeleteYn(int no) {
     this.deleteYn = no;
+  }
+
+  @PrePersist
+  public void onPrepersist() {
+    this.createdDate = LocalDateTime.parse(
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
+  }
+  @PreUpdate
+  public void onPreUpdate() {
+    this.modifiedDate = LocalDateTime.parse(
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
   }
 
 }
