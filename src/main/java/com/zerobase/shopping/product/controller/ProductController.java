@@ -1,6 +1,5 @@
 package com.zerobase.shopping.product.controller;
 
-import com.zerobase.shopping.img.service.ImgService;
 import com.zerobase.shopping.product.dto.CreateProduct;
 import com.zerobase.shopping.product.dto.ProductDetail;
 import com.zerobase.shopping.product.dto.SearchOption;
@@ -34,7 +33,7 @@ public class ProductController {
   @PreAuthorize("hasRole('ROLE_MANAGER')")
   public ResponseEntity<?> addProduct(@RequestBody CreateProduct request) {
 
-    Long productId = productService.saveProduct(request);
+    Long productId = productService.save(request);
 
     return ResponseEntity.ok(productId);
 
@@ -48,7 +47,7 @@ public class ProductController {
   @GetMapping("/product-detail")
   public ResponseEntity<?> productDetail(@RequestParam Long productId) {
 
-    ProductDetail result = this.productService.getProductDetail(productId);
+    ProductDetail result = this.productService.detail(productId);
 
 
     return ResponseEntity.ok(result);
@@ -67,10 +66,10 @@ public class ProductController {
    *
    * @return - productDto 목록 list, 페이징 정보 pagination 반환
    */
-  @GetMapping("/product-list")
+  @GetMapping("/list")
   public ResponseEntity<?> getProductList(@RequestParam(defaultValue = "0") int page,
       @RequestBody SearchOption option) {
-    Page<ProductDetail> result = productService.getProductList(page, option);
+    Page<ProductDetail> result = productService.productList(page, option);
 
     return ResponseEntity.ok(result);
   }
@@ -80,7 +79,7 @@ public class ProductController {
   @PostMapping("/update")
   @PreAuthorize("hasRole('ROLE_MANAGER')")
   public ResponseEntity<?> updateProduct(@RequestBody CreateProduct request) {
-    long result = productService.updateProduct(request);
+    long result = productService.update(request);
     return ResponseEntity.ok(result);
   }
 

@@ -1,8 +1,6 @@
 package com.zerobase.shopping.product.entity;
 
 import com.zerobase.shopping.img.entity.ImgEntity;
-import com.zerobase.shopping.img.service.ImgService;
-import com.zerobase.shopping.product.dto.CreateProduct;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -54,12 +52,12 @@ public class ProductEntity  {
   @PrePersist
   public void onPrepersist() {
     this.createdDate = LocalDateTime.parse(
-        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
   }
   @PreUpdate
   public void onPreUpdate() {
     this.modifiedDate = LocalDateTime.parse(
-        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
   }
 
 }

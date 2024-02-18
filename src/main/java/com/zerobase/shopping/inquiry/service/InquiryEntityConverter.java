@@ -2,16 +2,18 @@ package com.zerobase.shopping.inquiry.service;
 
 import com.zerobase.shopping.img.service.ImgEntityConverter;
 import com.zerobase.shopping.img.service.ImgService;
+import com.zerobase.shopping.inquiry.dto.InquiryDetail;
 import com.zerobase.shopping.inquiry.dto.ListResponse;
 import com.zerobase.shopping.inquiry.dto.WriteRequest;
 import com.zerobase.shopping.inquiry.entity.InquiryEntity;
 import com.zerobase.shopping.member.service.MemberService;
 import com.zerobase.shopping.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 public class InquiryEntityConverter {
-  private final ImgService imgService;
   private final MemberService memberService;
   private final ProductService productService;
 
@@ -30,8 +32,8 @@ public class InquiryEntityConverter {
         .build();
   }
 
-  public WriteRequest toDetail(InquiryEntity entity) {
-    return WriteRequest.builder()
+  public InquiryDetail toDetail(InquiryEntity entity) {
+    return InquiryDetail.builder()
         .inquiryId(entity.getInquiryId())
         .writer(entity.getWriter().getUsername())
         .title(entity.getTitle())

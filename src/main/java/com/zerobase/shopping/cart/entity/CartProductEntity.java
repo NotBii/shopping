@@ -36,6 +36,6 @@ public class CartProductEntity {
   private int count;
 
  public void changeCount(int count) {
-   this.count += count;
+   this.count = count;
  }
 }
