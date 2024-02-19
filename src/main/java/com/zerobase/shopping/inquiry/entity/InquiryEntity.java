@@ -1,6 +1,7 @@
 package com.zerobase.shopping.inquiry.entity;
 
 import com.zerobase.shopping.img.entity.ImgEntity;
+import com.zerobase.shopping.inquiry.dto.WriteRequest;
 import com.zerobase.shopping.member.entity.MemberEntity;
 import com.zerobase.shopping.product.entity.ProductEntity;
 import jakarta.persistence.Entity;
@@ -16,6 +17,7 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,10 +53,11 @@ public class InquiryEntity {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "inquiryId")
-  private List<ImgEntity> imgList;
+  @Default
+  private List<ImgEntity> imgList = new ArrayList<>();
 
   @Default
-  private int deleteYn = 0;
+  private int isDeleted = 0;
 
   @CreatedDate
   private LocalDateTime createdDate;
@@ -64,18 +67,39 @@ public class InquiryEntity {
 
   private long readCount;
 
-  public void changeDeleteYn(int no) {this.deleteYn = no;}
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parentId")
+  private InquiryEntity parent;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "parent", orphanRemoval = true)
+  private List<InquiryEntity> children = new ArrayList<>();
+
+  private int isSecret;
+
+  public void changeDeleteYn(int no) {this.isDeleted = no;}
+  public void readCountUp() { this.readCount += 1; }
+
 
   @PrePersist
   public void onPrepersist() {
     this.createdDate = LocalDateTime.parse(
-        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
   }
   @PreUpdate
   public void onPreUpdate() {
     this.modifiedDate = LocalDateTime.parse(
-        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm")));
+        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
   }
+
+  public void update(WriteRequest request, List<ImgEntity> imgs) {
+    this.title = request.getTitle();
+    this.content = request.getContent();
+    this.imgList.clear();
+    this.imgList.addAll(imgs);
+
+  }
+
 
 
 

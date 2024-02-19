@@ -29,10 +29,16 @@ public class WriteRequest {
 
   private List<ImgDto> imgList;
 
-  private int deleteYn;
+  private int isDeleted;
 
   private LocalDateTime createdDate;
 
   private LocalDateTime modifiedDate;
+
+  private Long parentId;
+
+  private List<Long> children;
+
+  private int isSecret;
 
 }

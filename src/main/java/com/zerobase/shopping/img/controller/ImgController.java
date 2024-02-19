@@ -21,10 +21,10 @@ public class ImgController {
 
   private final ImgService imgService;
 
-//  @PreAuthorize("hasRole('ROLE_MANAGER')")
   @PostMapping("/upload")
   public ResponseEntity<?> uploadImg(@RequestPart("imgs") List<MultipartFile> files) {
 
+    System.out.println(files);
     List<ImgDto> result = imgService.uploadImgs(files);
 
     return ResponseEntity.ok(result);
@@ -36,7 +36,6 @@ public class ImgController {
    *         List<Long> removeList : 삭제할 이미지 번호
    *         List<Long> originalList : 업로드 했던 이미지 번호
    * @param files : 새로 추가 할 multippartfile
-   * @return
    */
   @PostMapping("/update")
   public ResponseEntity<?> updateImgList(@RequestPart ImgListUpdate request,

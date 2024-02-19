@@ -6,7 +6,6 @@ import com.zerobase.shopping.product.dto.ProductDetail;
 import com.zerobase.shopping.product.dto.SearchOption;
 import com.zerobase.shopping.product.entity.ProductEntity;
 import com.zerobase.shopping.product.repository.ProductRepository;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,8 +28,7 @@ public class ProductService {
    * @param dto : 등록 할 상품정보(CreateProduct)
    * @return 등록된 번호
    */
-  public Long saveProduct(CreateProduct dto) {
-    dto.setCreatedDate(LocalDateTime.now());
+  public Long save(CreateProduct dto) {
     ProductEntity entity = productEntityConverter.createProductToEntity(dto);
     productRepository.save(entity);
 
@@ -39,26 +37,23 @@ public class ProductService {
     return entity.getProductId();
   }
 
-  public ProductDetail getProductDetail(Long productId) {
+  public ProductDetail detail(Long productId) {
     ProductEntity entity = productRepository.findByProductId(productId).orElseThrow(NoResult::new);
 
     return productEntityConverter.toProductDetail(entity);
   }
 
-  public Page<ProductDetail> getProductList(int page, SearchOption option) {
+  public Page<ProductDetail> productList(int page, SearchOption option) {
     Page<ProductDetail> result;
     Pageable pageable;
     String word = option.getWord();
     String direction = option.getSortDirection();
     if (direction.equals("asc")) {
       pageable = PageRequest.of(page, 20, Sort.by(option.getSort()).ascending());
-      System.out.println("asc");
     } else {
       pageable = PageRequest.of(page, 20, Sort.by(option.getSort()).descending());
-      System.out.println("dsc");
     }
-
-    if (word != null) {
+    if (word.length() != 0) {
       result = productRepository.findAllByTitleContainingAndDeleteYn(pageable, word, 0)
           .map(productEntityConverter::toProductDetail);
     } else {
@@ -70,8 +65,7 @@ public class ProductService {
   }
 
 
-  public Long updateProduct(CreateProduct request) {
-    request.setModifiedDate(LocalDateTime.now());
+  public Long update(CreateProduct request) {
     ProductEntity updateEntity = productEntityConverter.createProductToEntity(request);
     productRepository.save(updateEntity);
     log.info(updateEntity.getProductId() + " 수정 완료");
