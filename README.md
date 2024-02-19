@@ -48,7 +48,7 @@
 
 ## 2. erd
 
-![](erd 2차.png)
+![](erd 3차.png)
 ## 3. Trouble Shooting
 
 ## 4. Tech Stack
