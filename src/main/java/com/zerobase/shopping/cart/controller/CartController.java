@@ -3,6 +3,8 @@ package com.zerobase.shopping.cart.controller;
 import com.zerobase.shopping.cart.dto.CartProduct;
 import com.zerobase.shopping.cart.service.CartService;
 import com.zerobase.shopping.member.dto.MemberDetails;
+import com.zerobase.shopping.order.dto.ProductCount;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +58,10 @@ public class CartController {
 
 
   @PostMapping("/to-order")
-  public ResponseEntity<?> cartToOrder(@AuthenticationPrincipal AccountModel user) {
+  public ResponseEntity<ArrayList<ProductCount>> cartToOrder(@RequestBody ArrayList<CartProduct> request, @AuthenticationPrincipal MemberDetails member) {
 
+    ArrayList<ProductCount> result = cartService.toOrder(request, member);
 
+    return ResponseEntity.ok(result);
   }
 }

@@ -9,15 +9,19 @@ import com.zerobase.shopping.commons.exception.impl.MemberNotFound;
 import com.zerobase.shopping.commons.exception.impl.NoResult;
 import com.zerobase.shopping.commons.exception.impl.ProductNotFound;
 import com.zerobase.shopping.commons.exception.impl.UserNotMatch;
+import com.zerobase.shopping.member.dto.MemberDetails;
 import com.zerobase.shopping.member.entity.MemberEntity;
 import com.zerobase.shopping.member.repository.MemberRepository;
+import com.zerobase.shopping.order.dto.ProductCount;
 import com.zerobase.shopping.product.entity.ProductEntity;
 import com.zerobase.shopping.product.repository.ProductRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -96,5 +100,18 @@ public class CartService {
     }
   }
 
+  @Transactional
+  public ArrayList<ProductCount> toOrder(ArrayList<CartProduct> request, MemberDetails member) {
+    ArrayList<ProductCount> result = new ArrayList<>();
+    for (CartProduct cp : request) {
+      ProductCount productCount = ProductCount.builder()
+          .productId(cp.getProductId())
+          .count(cp.getCount())
+          .build();
+      result.add(productCount);
+      changeProductCount(member.getUsername(), cp.getCartProductId(), 0);
+    }
 
+    return result;
+  }
 }
