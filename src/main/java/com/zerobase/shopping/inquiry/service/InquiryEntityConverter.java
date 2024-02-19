@@ -37,7 +37,7 @@ public class InquiryEntityConverter {
         .isDeleted(request.getIsDeleted())
         .createdDate(request.getCreatedDate())
         .modifiedDate(request.getModifiedDate())
-        .parent(request.getParentId() == null? null : getEntity.inquiryEntity(request.getParentId()))
+        .parent(getEntity.inquiryEntity(request.getParentId()))
         .children(children)
         .isSecret(request.getIsSecret())
         .build();
@@ -63,6 +63,7 @@ public class InquiryEntityConverter {
   public ListResponse toListResponse(InquiryEntity entity) {
     return ListResponse.builder()
         .inquiryId(entity.getInquiryId())
+        .title(entity.getTitle())
         .writer(entity.getWriter().getUsername())
         .readCount(entity.getReadCount())
         .content(entity.getContent())
@@ -70,8 +71,8 @@ public class InquiryEntityConverter {
         .createdDate(entity.getCreatedDate())
         .productId(entity.getProductId().getProductId())
         .productName(entity.getProductId().getTitle())
-        .parentId(entity.getParent()== null? null : entity.getParent().getInquiryId())
-        .childrenId(entity.getChildren() == null? null : entity.getChildren().stream().map(InquiryEntity::getInquiryId).toList())
+        .parentId(entity.getParent() == null ? null: entity.getParent().getInquiryId())
+        .childrenId(entity.getChildren() == null ? null : entity.getChildren().stream().map(InquiryEntity::getInquiryId).toList())
         .build();
   }
 

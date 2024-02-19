@@ -21,7 +21,7 @@ public class OrderEntityConverter {
 
     return OrderEntity.builder()
         .title(request.getTitle())
-        .memberId(memberService.getMemberEntity(request.getUsername()))
+        .member(memberService.getMemberEntity(request.getUsername()))
         .address(request.getAddress())
         .recipient(request.getRecipient())
         .payCheck(request.getPayCheck())
@@ -53,7 +53,7 @@ public class OrderEntityConverter {
     return OrderDetails.builder()
         .orderDetailsId(entity.getOrderDetailsId())
         .orderId(entity.getOrderDetailsId())
-        .product(productEntityConverter.toProductSummary(entity.getProductId()))
+        .product(productEntityConverter.toProductSummary(entity.getProduct()))
         .count(entity.getCount())
         .status(entity.getStatus())
         .cost(entity.getCost())

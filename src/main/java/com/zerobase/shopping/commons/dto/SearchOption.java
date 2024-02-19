@@ -1,21 +1,25 @@
-package com.zerobase.shopping.product.dto;
+package com.zerobase.shopping.commons.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 @Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchOption {
   private String type;
+
   private String word;
+
   @Default
-  private String sort = "productId";
+  private String sort = "inquiryId";
+
   @Default
   private String sortDirection = "desc";
 

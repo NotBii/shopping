@@ -1,11 +1,13 @@
 package com.zerobase.shopping.inquiry.service;
 
 import com.zerobase.shopping.commons.GetEntity;
+import com.zerobase.shopping.commons.PageOptions;
 import com.zerobase.shopping.commons.exception.impl.NoAuth;
 import com.zerobase.shopping.img.entity.ImgEntity;
 import com.zerobase.shopping.img.service.ImgEntityConverter;
 import com.zerobase.shopping.inquiry.dto.InquiryDetail;
 import com.zerobase.shopping.inquiry.dto.ListResponse;
+import com.zerobase.shopping.commons.dto.SearchOption;
 import com.zerobase.shopping.inquiry.dto.WriteRequest;
 import com.zerobase.shopping.inquiry.entity.InquiryEntity;
 import com.zerobase.shopping.inquiry.repository.InquiryRepository;
@@ -14,9 +16,7 @@ import com.zerobase.shopping.product.entity.ProductEntity;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,7 +33,7 @@ public class InquiryService {
    * @param member 로그인멤버정보
    * @return 글 번호
    */
-  public Long write (WriteRequest inquiryRequest, MemberDetails member) {
+  public long write (WriteRequest inquiryRequest, MemberDetails member) {
     inquiryRequest.setWriter(member.getUsername());
     InquiryEntity entity = inquiryConverter.toEntity(inquiryRequest);
     inquiryRepository.save(entity);
@@ -47,10 +47,26 @@ public class InquiryService {
    * @param productId 상품번호
    * @return 상품목록응답DTO
    */
-  public Page<ListResponse> inquiryList(int page, Long productId) {
-    Pageable pageable = PageRequest.of(page, 10, Sort.by("inquiryId").descending());
-    ProductEntity productEntity = getEntity.productEntity(productId);
-    return inquiryRepository.findByProductIdAndIsDeleted(pageable, productEntity, 0).map(inquiryConverter::toListResponse);
+  public Page<ListResponse> inquiryList(int page, long productId, SearchOption search) {
+      ProductEntity entity = getEntity.productEntity(productId);
+      String type = search.getType();
+      String word = search.getWord();
+      Pageable pageable = PageOptions.getPageable(search, page, 20);
+      Page<InquiryEntity> list = switch (type) {
+        case "title" ->
+            inquiryRepository.findByProductIdAndIsDeletedAndTitleContaining(pageable, entity, 0,
+                word);
+        case "writer" ->
+            inquiryRepository.findByProductIdAndIsDeletedAndWriter(pageable, entity, 0,
+                getEntity.memberEntity(word));
+        case "content" ->
+            inquiryRepository.findByProductIdAndIsDeletedAndContentContains(pageable, entity, 0,
+                word);
+        default -> inquiryRepository.findByProductIdAndIsDeleted(pageable, entity, 0);
+      };
+
+    return list.map(inquiryConverter::toListResponse);
+
   }
 
   /**
@@ -60,7 +76,7 @@ public class InquiryService {
    * @return 상세보기DTO
    */
 
-  public InquiryDetail detail(Long inquiryId, MemberDetails member) {
+  public InquiryDetail detail(long inquiryId, MemberDetails member) {
     InquiryEntity entity = getEntity.inquiryEntity(inquiryId);
 
     if (entity.getIsSecret() != 0) {
@@ -94,12 +110,12 @@ public class InquiryService {
     return inquiryEntity.getInquiryId();
   }
 
-  public void changeIsDeleted(Long inquiryId, MemberDetails member, int deleteYn) {
+  public void changeIsDeleted(long inquiryId, MemberDetails member, int deleteYn) {
     InquiryEntity inquiryEntity = getEntity.inquiryEntity(inquiryId);
 
     checkUser(inquiryEntity, member);
 
-    inquiryEntity.changeDeleteYn(deleteYn);
+    inquiryEntity.changeIsDeleted(deleteYn);
   }
 
 

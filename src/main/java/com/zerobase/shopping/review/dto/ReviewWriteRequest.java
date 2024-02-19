@@ -1,33 +1,32 @@
-package com.zerobase.shopping.inquiry.dto;
+package com.zerobase.shopping.review.dto;
 
 import com.zerobase.shopping.img.dto.ImgDto;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InquiryDetail {
-  private long inquiryId;
+@Builder
+public class ReviewWriteRequest {
+
+  private long reviewId;
   private String writer;
   private String title;
   private String content;
   private long productId;
-  private List<ImgDto> imgList;
-  private int isDeleted;
-  private LocalDateTime createdDate;
-  private LocalDateTime modifiedDate;
+  @Default
+  private List<ImgDto> imgList = new ArrayList<>();
   private long readCount;
-  private Long parentId;
-  private List<Long> childrenId;
-  private int isSecret;
+  private int score;
+  private int isDeleted;
 
 
 }

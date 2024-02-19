@@ -55,9 +55,9 @@ public class CartController {
   }
 
 
-//  @PostMapping("/to-order")
-//  public ResponseEntity<?> cartToOrder(@AuthenticationPrincipal AccountModel user) {
-//
-//
-//  }
+  @PostMapping("/to-order")
+  public ResponseEntity<?> cartToOrder(@AuthenticationPrincipal AccountModel user) {
+
+
+  }
 }
