@@ -1,6 +1,7 @@
 package com.zerobase.shopping.inquiry.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,10 +27,16 @@ public class ListResponse {
 
   private long readCount;
 
-  private int deleteYn;
+  private int isDeleted;
 
   private long productId;
 
   private String productName;
+
+  private Long parentId;
+
+  private List<Long> childrenId;
+
+  private int isSecret;
 
 }

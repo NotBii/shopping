@@ -53,10 +53,11 @@ public class InquiryEntity {
 
   @OneToMany(orphanRemoval = true)
   @JoinColumn(name = "inquiryId")
+  @Default
   private List<ImgEntity> imgList = new ArrayList<>();
 
   @Default
-  private int deleteYn = 0;
+  private int isDeleted = 0;
 
   @CreatedDate
   private LocalDateTime createdDate;
@@ -66,7 +67,17 @@ public class InquiryEntity {
 
   private long readCount;
 
-  public void changeDeleteYn(int no) {this.deleteYn = no;}
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parentId")
+  private InquiryEntity parent;
+
+  @Builder.Default
+  @OneToMany(mappedBy = "parent", orphanRemoval = true)
+  private List<InquiryEntity> children = new ArrayList<>();
+
+  private int isSecret;
+
+  public void changeDeleteYn(int no) {this.isDeleted = no;}
   public void readCountUp() { this.readCount += 1; }
 
 

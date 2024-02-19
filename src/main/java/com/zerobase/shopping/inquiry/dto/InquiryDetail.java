@@ -21,10 +21,13 @@ public class InquiryDetail {
   private String content;
   private Long productId;
   private List<ImgDto> imgList;
-  private int deleteYn;
+  private int isDeleted;
   private LocalDateTime createdDate;
   private LocalDateTime modifiedDate;
   private long readCount;
+  private Long parentId;
+  private List<Long> childrenId;
+  private int isSecret;
 
 
 }

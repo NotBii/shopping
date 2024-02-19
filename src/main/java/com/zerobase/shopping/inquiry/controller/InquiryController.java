@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +43,9 @@ public class InquiryController {
   }
 
   @GetMapping("/{inquiryId}")
-  public ResponseEntity<InquiryDetail> detail(@PathVariable Long inquiryId) {
-    InquiryDetail result = inquiryService.detail(inquiryId);
+  public ResponseEntity<InquiryDetail> detail(@PathVariable Long inquiryId, @AuthenticationPrincipal MemberDetails member) {
+    InquiryDetail result = inquiryService.detail(inquiryId, member);
+
     return ResponseEntity.ok(result);
   }
 
@@ -56,9 +58,17 @@ public class InquiryController {
 
   @DeleteMapping("/delete/{inquiryId}")
   public ResponseEntity<String> delete(@PathVariable Long inquiryId, @AuthenticationPrincipal MemberDetails member) {
-    inquiryService.changeDeleteYn(inquiryId, member, 1);
+    inquiryService.changeIsDeleted(inquiryId, member, 1);
 
     return ResponseEntity.ok("삭제완료");
+  }
+
+  @PostMapping("/recover/{inquiryId}")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  public ResponseEntity<String> recover(@PathVariable Long inquiryId, @AuthenticationPrincipal MemberDetails member) {
+    inquiryService.changeIsDeleted(inquiryId, member, 0);
+
+    return ResponseEntity.ok("복구완료");
   }
 
 }
