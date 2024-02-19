@@ -1,6 +1,6 @@
 package com.zerobase.shopping.order.entity;
 
-import com.zerobase.shopping.order.entity.OrderEntity;
+import com.zerobase.shopping.member.entity.MemberEntity;
 import com.zerobase.shopping.product.entity.ProductEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,10 +30,13 @@ public class OrderDetailsEntity {
   private long orderDetailsId;
   @ManyToOne
   @JoinColumn(name = "orderId")
-  private OrderEntity orderId;
+  private OrderEntity order;
+  @ManyToOne
+  @JoinColumn(name = "memberId")
+  private MemberEntity member;
   @ManyToOne
   @JoinColumn(name = "productId")
-  private ProductEntity productId;
+  private ProductEntity product;
   private int count;
   private Long cost;
   private String status;

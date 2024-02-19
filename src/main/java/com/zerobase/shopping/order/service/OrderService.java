@@ -1,17 +1,14 @@
 package com.zerobase.shopping.order.service;
 
-import com.zerobase.shopping.commons.exception.impl.MemberNotFound;
-import com.zerobase.shopping.commons.exception.impl.NoResult;
+import com.zerobase.shopping.commons.GetEntity;
 import com.zerobase.shopping.commons.exception.impl.OrderIsProcessing;
 import com.zerobase.shopping.commons.exception.impl.OrderNotFound;
 import com.zerobase.shopping.commons.exception.impl.OutOfStock;
-import com.zerobase.shopping.commons.exception.impl.ProductNotFound;
 import com.zerobase.shopping.commons.exception.impl.UserNotMatch;
 import com.zerobase.shopping.member.dto.MemberDetails;
 import com.zerobase.shopping.order.dto.ProductCount;
 import com.zerobase.shopping.order.dto.StatusRequest;
 import com.zerobase.shopping.member.entity.MemberEntity;
-import com.zerobase.shopping.member.repository.MemberRepository;
 import com.zerobase.shopping.order.dto.OrderDetails;
 import com.zerobase.shopping.order.dto.OrderListRequest;
 import com.zerobase.shopping.order.dto.OrderRequest;
@@ -23,15 +20,9 @@ import com.zerobase.shopping.order.entity.OrderEntity;
 import com.zerobase.shopping.order.repository.OrderDetailsRepository;
 import com.zerobase.shopping.order.repository.OrderRepository;
 import com.zerobase.shopping.product.entity.ProductEntity;
-import com.zerobase.shopping.product.repository.ProductRepository;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,9 +38,8 @@ public class OrderService {
 
   private final OrderRepository orderRepository;
   private final OrderEntityConverter orderEntityConverter;
-  private final ProductRepository productRepository;
   private final OrderDetailsRepository orderDetailsRepository;
-  private final MemberRepository memberRepository;
+  private final GetEntity getEntity;
 
   /**
    * 주문추가하기
@@ -63,7 +53,7 @@ public class OrderService {
     request.setUsername(username);
 
     ArrayList<ProductCount> pcList = request.getProduct();
-    String productName = getProductEntity(pcList.get(0).getProductId()).getTitle();
+    String productName = getEntity.productEntity(pcList.get(0).getProductId()).getTitle();
 
     request.setTitle(productName + " 외" + (pcList.size() - 1) + " 건");
 
@@ -76,12 +66,12 @@ public class OrderService {
   }
 
   /**
-   * @param order   주문Entity
-   * @param pcList  상품id, 수량
+   * @param order  주문Entity
+   * @param pcList 상품id, 수량
    */
   public void makeOrderDetails(OrderEntity order, ArrayList<ProductCount> pcList) {
     for (ProductCount pc : pcList) {
-      ProductEntity productEntity = getProductEntity(pc.getProductId());
+      ProductEntity productEntity = getEntity.productEntity(pc.getProductId());
       int count = pc.getCount();
 
       if (productEntity.getStock() < count) {
@@ -89,8 +79,8 @@ public class OrderService {
       }
 
       OrderDetailsEntity entity = OrderDetailsEntity.builder()
-          .orderId(order)
-          .productId(productEntity)
+          .order(order)
+          .product(productEntity)
           .status("결제대기")
           .count(count)
           .cost(count * productEntity.getPrice())
@@ -106,9 +96,9 @@ public class OrderService {
   public Page<OrderResponse> orderList(OrderListRequest request, MemberDetails member) {
     Pageable pageable = PageRequest.of(request.getPage(), 20, Sort.by("createAt").descending());
     String username = member.getUsername();
-    MemberEntity entity = getMemberEntity(username);
+    MemberEntity entity = getEntity.memberEntity(username);
 
-    return orderRepository.findByMemberId(pageable, entity).map(orderEntityConverter::toResponse);
+    return orderRepository.findByMember(pageable, entity).map(orderEntityConverter::toResponse);
 
   }
 
@@ -117,9 +107,9 @@ public class OrderService {
    */
   public List<OrderDetails> orderDetails(Long orderId, MemberDetails member) {
     checkUser(orderId, member);
-    OrderEntity order = getOrderEntity(orderId);
+    OrderEntity order = getEntity.orderEntity(orderId);
 
-    return orderDetailsRepository.findByOrderId(order).stream()
+    return orderDetailsRepository.findByOrder(order).stream()
         .map(orderEntityConverter::toOrderDetails).toList();
   }
 
@@ -127,24 +117,43 @@ public class OrderService {
    * 결제확인변경
    */
   public void payCheck(PayCheck request) {
-    OrderEntity entity = getOrderEntity(request.getOrderId());
+    OrderEntity entity = getEntity.orderEntity(request.getOrderId());
     entity.changePayCheck(request.getPayCheck());
+
   }
 
   /**
    * 주문상태변경
    */
   public void updateOrder(StatusRequest request) {
-    OrderEntity entity = getOrderEntity(request.getOrderId());
+    OrderEntity entity = getEntity.orderEntity(request.getOrderId());
     entity.changeStatus(request.getStatus());
+    orderRepository.save(entity);
+    List<OrderDetailsEntity> detailsEntities = getEntity.orderDetailsEntity(entity);
+    int isRefund = -1;
+    if (request.getStatus().equals("배송중")) {
+      isRefund = -1;
+    } else if (request.getStatus().equals("환불완료")) {
+      isRefund = 1;
+    }
+    for (OrderDetailsEntity de : detailsEntities) {
+      de.getProduct().updateStock(de.getCount() * isRefund);
+      de.changeStatus(request.getStatus());
+      orderDetailsRepository.save(de);
+      log.info(de.getOrderDetailsId() +" " + request.getStatus() + "처리완료");
+      log.info(de.getProduct().getProductId() + " 수량 " + de.getProduct().getStock() + " 남음");
+    }
+
   }
+
   /**
    * 주문상세정보 상태변경
    */
   @Transactional
   public void updateDetails(List<UpdateDetailsRequest> requests) {
     for (UpdateDetailsRequest request : requests) {
-      OrderDetailsEntity entity = orderDetailsRepository.findByOrderDetailsId(request.getOrderDetailsId())
+      OrderDetailsEntity entity = orderDetailsRepository.findByOrderDetailsId(
+              request.getOrderDetailsId())
           .orElseThrow(OrderNotFound::new);
       entity.changeStatus(request.getStatus());
       orderDetailsRepository.save(entity);
@@ -155,16 +164,24 @@ public class OrderService {
    * 주문취소
    */
   public void cancel(Long orderId, MemberDetails member) {
-    OrderEntity order = getOrderEntity(orderId);
+    OrderEntity order = getEntity.orderEntity(orderId);
     checkUser(orderId, member);
 
-    if (order.getStatus().equals("상품준비중")) {
+    if (order.getStatus().equals("배송중")) {
       throw new OrderIsProcessing();
+    }
+    List<OrderDetailsEntity> detailsEntities = getEntity.orderDetailsEntity(order);
+    for (OrderDetailsEntity de : detailsEntities) {
+      de.changeStatus("주문취소");
+      orderDetailsRepository.save(de);
+      log.info(de.getOrderDetailsId() + "주문취소 처리완료");
     }
 
     order.changeStatus("주문취소");
-  }
+    orderRepository.save(order);
+    log.info(order.getOrderId() + "주문취소 완료");
 
+  }
 
 
   /**
@@ -174,24 +191,18 @@ public class OrderService {
    * @param member
    */
   private void checkUser(Long orderId, MemberDetails member) {
-    OrderEntity order = getOrderEntity(orderId);
+    OrderEntity order = getEntity.orderEntity(orderId);
 
-    if (!member.getUsername().equals(order.getMemberId().getUsername())
+    if (!member.getUsername().equals(order.getMember().getUsername())
         && !member.getRole().equals("ROLE_MANGER")) {
       throw new UserNotMatch();
     }
 
   }
-
-  private OrderEntity getOrderEntity(Long orderId) {
-    return orderRepository.findByOrderId(orderId).orElseThrow(OrderNotFound::new);
-  }
-
-  private ProductEntity getProductEntity(Long productId) {
-    return productRepository.findByProductId(productId).orElseThrow(NoResult::new);
-  }
-
-  private MemberEntity getMemberEntity(String username) {
-    return memberRepository.findByUsername(username).orElseThrow(MemberNotFound::new);
-  }
 }
+
+
+
+
+
+

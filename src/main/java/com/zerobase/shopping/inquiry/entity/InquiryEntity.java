@@ -52,7 +52,7 @@ public class InquiryEntity {
   private ProductEntity productId;
 
   @OneToMany(orphanRemoval = true)
-  @JoinColumn(name = "inquiryId")
+  @JoinColumn(name = "imgs")
   @Default
   private List<ImgEntity> imgList = new ArrayList<>();
 
@@ -77,7 +77,7 @@ public class InquiryEntity {
 
   private int isSecret;
 
-  public void changeDeleteYn(int no) {this.isDeleted = no;}
+  public void changeIsDeleted(int no) {this.isDeleted = no;}
   public void readCountUp() { this.readCount += 1; }
 
 

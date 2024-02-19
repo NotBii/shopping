@@ -1,8 +1,9 @@
 package com.zerobase.shopping.product.controller;
 
+import com.zerobase.shopping.commons.dto.SearchOption;
 import com.zerobase.shopping.product.dto.CreateProduct;
 import com.zerobase.shopping.product.dto.ProductDetail;
-import com.zerobase.shopping.product.dto.SearchOption;
+import com.zerobase.shopping.product.dto.ProductSummary;
 import com.zerobase.shopping.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/product")
 @RequiredArgsConstructor
 public class ProductController {
+
   private final ProductService productService;
 
-  /**상품등록
+  /**
+   * 상품등록
    *
-   * @param request :
-   *                createProduct
+   * @param request : createProduct
    * @return productId : 등록된 상품번호
    */
   @PostMapping("/save")
@@ -39,7 +41,8 @@ public class ProductController {
 
   }
 
-  /**상품상세보기
+  /**
+   * 상품상세보기
    *
    * @param productId - 상품번호
    * @return - productDto, imgDto가 있는 해쉬맵 반환
@@ -49,31 +52,42 @@ public class ProductController {
 
     ProductDetail result = this.productService.detail(productId);
 
-
     return ResponseEntity.ok(result);
 
   }
 
-  /**상품목록보기
+  /**
+   * 상품목록보기
    *
-   * @param page - 현재 상품목록페이지
-   * @param option
-   *        SearchOption
-   *        String type : title
-   *        String word
-   *        String sort: price, date
-   *        boolean desc
-   *
+   * @param page   - 현재 상품목록페이지
+   * @param search SearchOption String type : title String word String sort: price, date boolean
+   *               desc
    * @return - productDto 목록 list, 페이징 정보 pagination 반환
    */
   @GetMapping("/list")
-  public ResponseEntity<?> getProductList(@RequestParam(defaultValue = "0") int page,
-      @RequestBody SearchOption option) {
-    Page<ProductDetail> result = productService.productList(page, option);
+  public ResponseEntity<Page<ProductSummary>> getProductList(
+      @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+      @RequestBody com.zerobase.shopping.commons.dto.SearchOption search) {
+    Page<ProductSummary> result = productService.list(page, search, 0);
 
     return ResponseEntity.ok(result);
   }
 
+  /**
+   * 삭제된 상품 보기
+   * @param page
+   * @param option
+   * @return
+   */
+  @GetMapping("/deleted-list")
+  @PreAuthorize("hasRole('ROLE_MANAGER')")
+  public ResponseEntity<Page<ProductSummary>> deletedProductList(
+      @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+      @RequestBody SearchOption option) {
+    Page<ProductSummary> result = productService.list(page, option, 1);
+
+    return ResponseEntity.ok(result);
+  }
 
 
   @PostMapping("/update")
@@ -84,7 +98,8 @@ public class ProductController {
   }
 
 
-  /** 상품삭제
+  /**
+   * 상품삭제
    *
    * @param productId - 상품번호
    * @return
@@ -99,6 +114,7 @@ public class ProductController {
 
   /**
    * 상품복구
+   *
    * @param productId
    * @return
    */

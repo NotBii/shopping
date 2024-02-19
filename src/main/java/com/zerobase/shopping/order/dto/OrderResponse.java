@@ -1,6 +1,6 @@
 package com.zerobase.shopping.order.dto;
 
-import com.zerobase.shopping.dto.ProductDto;
+import com.zerobase.shopping.product.dto.ProductSummary;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import lombok.Builder;
@@ -18,7 +18,7 @@ public class OrderResponse {
   private String payCheck;
   private String status;
   private String recipient;
-  private HashMap<ProductDto, Integer> product;
+  private HashMap<ProductSummary, Integer> product;
   private long cost;
   private LocalDateTime createdDate;
 

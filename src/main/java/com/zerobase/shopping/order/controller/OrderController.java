@@ -82,7 +82,7 @@ public class OrderController {
   }
 
   /**
-   * 주문상태변경
+   * 주문상태변경 (상세정보 일괄변경 포함)
    */
   @PostMapping("/update")
   @PreAuthorize("hasRole('ROLE_MANAGER')")
@@ -92,13 +92,13 @@ public class OrderController {
     return ResponseEntity.ok("상태변경완료");
   }
   /**
-   * 주문상세정보 상태변경
+   * 주문상세정보 개별변경(개별 상품 상태등 관리)
    */
   @PostMapping("/update-details")
   @PreAuthorize("hasRole('ROLE_MANAGER')")
   public ResponseEntity<?> updateOrderDetails(@RequestBody List<UpdateDetailsRequest> requests) {
     orderService.updateDetails(requests);
-    return ResponseEntity.ok("상태변경완료");
+    return ResponseEntity.ok("개별주문상태변경완료");
   }
 
   /**

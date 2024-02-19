@@ -1,11 +1,6 @@
 package com.zerobase.shopping.order.entity;
 
-import com.zerobase.shopping.commons.exception.impl.CodeNotFit;
 import com.zerobase.shopping.member.entity.MemberEntity;
-import com.zerobase.shopping.order.service.ServiceCodeConverter.statusConverter;
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,7 +29,7 @@ public class OrderEntity {
   private long orderId;
   @ManyToOne
   @JoinColumn(name = "memberId")
-  private MemberEntity memberId;
+  private MemberEntity member;
 
   private String address;
   private String phone;

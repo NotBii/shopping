@@ -44,6 +44,11 @@ public class ProductEntity  {
   private List<ImgEntity> imgList;
   @Default
   private int deleteYn = 0;
+  @Default
+  private long totalScore = 0;
+  @Default
+  private long reviewCount = 0;
+
 
   public void changeDeleteYn(int no) {
     this.deleteYn = no;
@@ -60,4 +65,12 @@ public class ProductEntity  {
         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
   }
 
+  public void updateScore(long score, int review) {
+    this.totalScore += score;
+    this.reviewCount += review;
+  }
+
+  public void updateStock(int count) {
+    this.stock += count;
+  }
 }
