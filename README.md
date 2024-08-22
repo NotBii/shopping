@@ -45,8 +45,9 @@
 
 
 ## 2. erd
+![erd 3차](https://github.com/user-attachments/assets/a506a979-d641-4ed0-a7ec-3466709eeae7)
 
-![](erd 3차.png)
+
 ## 3. Trouble Shooting
 
 ## 4. Tech Stack
